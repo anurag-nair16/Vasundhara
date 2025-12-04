@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 47 40% 98%;
+    --foreground: 147 25% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 147 25% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 147 25% 15%;
+
+    --primary: 152 65% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 173 60% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 147 15% 92%;
+    --muted-foreground: 147 10% 45%;
+
+    --accent: 38 92% 50%;
+    --accent-foreground: 147 25% 15%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 147 20% 88%;
+    --input: 147 20% 88%;
+    --ring: 152 65% 35%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 147 25% 15%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --earth: 30 40% 55%;
+    --earth-foreground: 0 0% 100%;
+
+    --leaf: 142 76% 36%;
+    --water: 199 89% 48%;
+    --sun: 38 92% 50%;
+
+    --gradient-eco: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--accent)) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(147 15% 96%) 100%);
+
+    --shadow-soft: 0 4px 20px -4px hsla(147, 25%, 15%, 0.1);
+    --shadow-eco: 0 8px 32px -8px hsla(152, 65%, 35%, 0.2);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 147 30% 97%;
+    --sidebar-foreground: 147 25% 20%;
+    --sidebar-primary: 152 65% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 147 15% 92%;
+    --sidebar-accent-foreground: 147 25% 20%;
+    --sidebar-border: 147 20% 88%;
+    --sidebar-ring: 152 65% 35%;
+  }
+
+  .dark {
+    --background: 147 25% 8%;
+    --foreground: 147 15% 95%;
+
+    --card: 147 20% 12%;
+    --card-foreground: 147 15% 95%;
+
+    --popover: 147 20% 12%;
+    --popover-foreground: 147 15% 95%;
+
+    --primary: 152 55% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 173 50% 40%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 147 15% 18%;
+    --muted-foreground: 147 10% 60%;
+
+    --accent: 38 82% 55%;
+    --accent-foreground: 147 25% 8%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 147 15% 20%;
+    --input: 147 15% 20%;
+    --ring: 152 55% 45%;
+
+    --success: 142 66% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 82% 55%;
+    --warning-foreground: 147 25% 8%;
+
+    --info: 199 79% 52%;
+    --info-foreground: 0 0% 100%;
+
+    --earth: 30 35% 45%;
+    --earth-foreground: 0 0% 100%;
+
+    --leaf: 142 66% 40%;
+    --water: 199 79% 52%;
+    --sun: 38 82% 55%;
+
+    --gradient-eco: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--accent)) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(147 20% 10%) 100%);
+
+    --shadow-soft: 0 4px 20px -4px hsla(0, 0%, 0%, 0.4);
+    --shadow-eco: 0 8px 32px -8px hsla(152, 55%, 45%, 0.3);
+
+    --sidebar-background: 147 25% 10%;
+    --sidebar-foreground: 147 15% 85%;
+    --sidebar-primary: 152 55% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 147 15% 18%;
+    --sidebar-accent-foreground: 147 15% 85%;
+    --sidebar-border: 147 15% 20%;
+    --sidebar-ring: 152 55% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .gradient-eco {
+    background: var(--gradient-eco);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-eco {
+    box-shadow: var(--shadow-eco);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
