@@ -132,7 +132,7 @@ const WasteManagement = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append('description', issueText);
+      formData.append('description', issueText.trim());
       formData.append('issue_type', 'Waste Management Issue');
       if (locationData) {
         formData.append('location', JSON.stringify(locationData));
@@ -141,11 +141,8 @@ const WasteManagement = () => {
         formData.append('photo', photoData);
       }
 
-      const response = await apiClient.post('/auth/report/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      });
+      // Don't set Content-Type header - axios will auto-set it with proper boundary
+      const response = await apiClient.post('/auth/report/', formData);
 
       if (response.status === 201) {
         toast.success('Issue reported successfully! Crew dispatched.');
@@ -157,7 +154,12 @@ const WasteManagement = () => {
       }
     } catch (error: any) {
       console.error('Failed to submit report:', error);
-      toast.error(error.response?.data?.error || 'Failed to submit report. Please try again.');
+      console.error('Response data:', error.response?.data);
+      const errorMessage = error.response?.data?.error ||
+        error.response?.data?.detail ||
+        (typeof error.response?.data === 'string' ? error.response.data : null) ||
+        'Failed to submit report. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -342,10 +344,10 @@ const WasteManagement = () => {
                             <span className="text-xs font-semibold text-muted-foreground">Severity:</span>
                             <Badge
                               className={`${report.severity === 'high'
-                                  ? 'bg-red-50 text-red-700 border-red-200'
-                                  : report.severity === 'medium'
-                                    ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                    : 'bg-green-50 text-green-700 border-green-200'
+                                ? 'bg-red-50 text-red-700 border-red-200'
+                                : report.severity === 'medium'
+                                  ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                  : 'bg-green-50 text-green-700 border-green-200'
                                 }`}
                               variant="outline"
                             >
