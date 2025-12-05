@@ -171,9 +171,10 @@ class WasteReportViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_waste_report(request):
-    """Create a new waste report with AI classification"""
+    """Create a new waste report with async AI validation"""
     try:
         import requests
+        import threading
         
         # Parse location data if provided
         location_data = request.data.get('location', {})
@@ -188,7 +189,7 @@ def create_waste_report(request):
         longitude = location_data.get('lon') if isinstance(location_data, dict) else None
         location_address = location_data.get('address') if isinstance(location_data, dict) else location_data
 
-        # Create waste report (initially without classification)
+        # Create waste report immediately with 'pending' status
         waste_report = WasteReport.objects.create(
             user=request.user,
             description=request.data.get('description'),
@@ -200,65 +201,84 @@ def create_waste_report(request):
         )
 
         # Handle photo upload
+        photo_path = None
         if 'photo' in request.FILES:
             print(f"Photo received: {request.FILES['photo'].name}")
             waste_report.photo = request.FILES['photo']
             waste_report.save()
-            print(f"Photo saved to: {waste_report.photo.path}")
-            
-            # Send image and description to environment_classifier for validation
-            try:
-                # Environment classifier server (use local testing port 8002)
-                validator_url = "http://localhost:8002/validate"
-                print(f"Calling validator at: {validator_url}")
-                with open(waste_report.photo.path, 'rb') as img_file:
-                    files = {'image': img_file}
-                    data = {'description': request.data.get('description', '')}
-                    validator_response = requests.post(validator_url, files=files, data=data, timeout=60)
-                
-                print(f"Validator response status: {validator_response.status_code}")
-                print(f"Validator response: {validator_response.text}")
-                
-                if validator_response.status_code == 200:
-                    validation_data = validator_response.json()
-                    print(f"Validation data: {validation_data}")
-                    
-                    if validation_data.get('is_valid', False):
-                        # Valid report - save classification results
-                        waste_report.category = validation_data.get('category')
-                        waste_report.severity = validation_data.get('severity')
-                        waste_report.response_time = validation_data.get('response_time')
-                        waste_report.status = 'pending'
-                        print(f"Valid report: category={waste_report.category}, severity={waste_report.severity}")
-                    else:
-                        # Invalid report - mark as invalid
-                        waste_report.status = 'invalid'
-                        print(f"Invalid report: {validation_data.get('reason', 'Unknown reason')}")
-                else:
-                    # Classifier returned error, mark as pending for manual review
-                    print(f"Validator error, keeping as pending")
-            except requests.exceptions.RequestException as e:
-                # If validator fails, log error but mark as pending for manual review
-                print(f"Error calling environment validator: {str(e)}")
-                pass
+            photo_path = waste_report.photo.path
+            print(f"Photo saved to: {photo_path}")
         else:
             print("No photo in request.FILES")
 
         # Handle voice note upload
         if 'voice_note' in request.FILES:
             waste_report.voice_note = request.FILES['voice_note']
-
-        waste_report.save()
-        print(f"Final report saved with category={waste_report.category}, severity={waste_report.severity}")
+            waste_report.save()
 
         # Update user profile - increment issues_reported
         profile = request.user.userprofile
         profile.issues_reported += 1
         profile.save()
 
+        # Start background validation if photo exists
+        if photo_path:
+            description = request.data.get('description', '')
+            report_id = waste_report.id
+            
+            def validate_in_background(report_id, photo_path, description):
+                """Run validation in background thread"""
+                try:
+                    print(f"[BG] Starting validation for report {report_id}")
+                    validator_url = "http://localhost:8002/validate"
+                    
+                    with open(photo_path, 'rb') as img_file:
+                        files = {'image': img_file}
+                        data = {'description': description}
+                        validator_response = requests.post(validator_url, files=files, data=data, timeout=120)
+                    
+                    print(f"[BG] Validator response: {validator_response.status_code}")
+                    
+                    if validator_response.status_code == 200:
+                        validation_data = validator_response.json()
+                        print(f"[BG] Validation data: {validation_data}")
+                        
+                        # Update the report with validation results
+                        from .models import WasteReport
+                        try:
+                            report = WasteReport.objects.get(id=report_id)
+                            
+                            if validation_data.get('is_valid', False):
+                                report.category = validation_data.get('category')
+                                report.severity = validation_data.get('severity')
+                                report.response_time = validation_data.get('response_time')
+                                report.status = 'pending'
+                                print(f"[BG] Valid report: category={report.category}")
+                            else:
+                                report.status = 'invalid'
+                                print(f"[BG] Invalid: {validation_data.get('reason')}")
+                            
+                            report.save()
+                        except WasteReport.DoesNotExist:
+                            print(f"[BG] Report {report_id} not found")
+                    else:
+                        print(f"[BG] Validator error: {validator_response.status_code}")
+                        
+                except Exception as e:
+                    print(f"[BG] Validation error: {str(e)}")
+            
+            # Start background thread
+            thread = threading.Thread(
+                target=validate_in_background,
+                args=(report_id, photo_path, description)
+            )
+            thread.daemon = True
+            thread.start()
+            print(f"[MAIN] Background validation started for report {report_id}")
+
         serializer = WasteReportSerializer(waste_report)
         return Response({
-            "message": "Waste report created successfully!",
+            "message": "Report submitted! Validation in progress...",
             "report": serializer.data
         }, status=status.HTTP_201_CREATED)
     except Exception as e:
