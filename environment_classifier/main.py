@@ -10,7 +10,7 @@ import time
 import traceback
 
 # Initialize client
-genai.configure(api_key="AIzaSyCVzn5jzU_P8DctTeWreVek9tw_nh4b4Ig")
+genai.configure(api_key="AIzaSyBfe9T7BefMy3eRxcY3ilgE6FQ5viuMfdw")
 # Use Gemini 2.0 Flash - latest model with vision support
 MODEL_NAME = "gemini-2.0-flash"
 
