@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { 
-  User, 
-  Mail, 
-  Bell, 
+import {
+  User,
+  Mail,
+  Bell,
   Globe,
   Shield,
   Moon,
@@ -24,16 +24,10 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const Profile = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, navigate]);
 
   if (!user) return null;
 
@@ -52,7 +46,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,8 +89,8 @@ const Profile = () => {
                 <Label htmlFor="role">Role</Label>
                 <Input id="role" defaultValue={user.role} disabled className="mt-1 bg-muted" />
               </div>
-              <Button 
-                className="gradient-eco shadow-eco" 
+              <Button
+                className="gradient-eco shadow-eco"
                 onClick={handleSaveProfile}
                 disabled={isLoading}
               >
@@ -129,7 +123,7 @@ const Profile = () => {
                 </div>
                 <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Bell className="h-5 w-5 text-primary" />

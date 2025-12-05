@@ -6,11 +6,11 @@ import ScoreCard from '@/components/ScoreCard';
 import apiClient from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Leaf, 
-  Users, 
-  TrendingUp, 
-  AlertCircle, 
+import {
+  Leaf,
+  Users,
+  TrendingUp,
+  AlertCircle,
   Award,
   Bell,
   MapPin,
@@ -19,7 +19,7 @@ import {
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total_reports: 0,
@@ -30,12 +30,8 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    } else {
-      fetchStats();
-    }
-  }, [isAuthenticated, navigate]);
+    fetchStats();
+  }, []);
 
   const fetchStats = async () => {
     try {
@@ -49,6 +45,7 @@ const Dashboard = () => {
   };
 
   if (!user) return null;
+
 
   const notifications = [
     { id: 1, type: 'success', message: 'Bin overflow resolved - Crew dispatched successfully', time: '10 min ago' },
@@ -69,7 +66,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Welcome Section */}
         <motion.div
@@ -165,11 +162,10 @@ const Dashboard = () => {
             {notifications.map((notification) => (
               <Card key={notification.id} className="p-4 gradient-card border-border/50">
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-full ${
-                    notification.type === 'success' ? 'bg-success/10 text-success' :
-                    notification.type === 'warning' ? 'bg-warning/10 text-warning' :
-                    'bg-info/10 text-info'
-                  }`}>
+                  <div className={`p-2 rounded-full ${notification.type === 'success' ? 'bg-success/10 text-success' :
+                      notification.type === 'warning' ? 'bg-warning/10 text-warning' :
+                        'bg-info/10 text-info'
+                    }`}>
                     <Bell className="h-4 w-4" />
                   </div>
                   <div className="flex-1">

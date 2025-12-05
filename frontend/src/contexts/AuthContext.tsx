@@ -17,6 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (username: string, email: string, password: string, role?: string) => Promise<void>;
   logout: () => void;
@@ -27,20 +28,57 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session and tokens
-    const storedUser = localStorage.getItem('vasundhara_user');
-    const accessToken = localStorage.getItem('vasundhara_access_token');
-    
-    if (storedUser && accessToken) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        localStorage.removeItem('vasundhara_user');
+    const initializeAuth = async () => {
+      const storedUser = localStorage.getItem('vasundhara_user');
+      const accessToken = localStorage.getItem('vasundhara_access_token');
+
+      if (storedUser && accessToken) {
+        try {
+          // First, restore the user from localStorage for immediate UI
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+
+          // Then validate the token by fetching fresh profile data
+          try {
+            const profileResponse = await apiClient.get('/auth/profile/');
+            const userProfile = profileResponse.data;
+
+            // Update user with fresh data from server
+            const updatedUser: User = {
+              id: userProfile.user || parsedUser.email,
+              name: userProfile.name || parsedUser.name,
+              email: parsedUser.email,
+              role: userProfile.role || 'citizen',
+              ecoScore: userProfile.eco_score || 0,
+              civicScore: userProfile.civic_score || 0,
+              carbonCredits: userProfile.carbon_credits || 0,
+              issuesReported: userProfile.issues_reported || 0,
+              tasksCompleted: userProfile.tasks_completed || 0,
+              badge: userProfile.badge || 'Bronze'
+            };
+
+            setUser(updatedUser);
+            localStorage.setItem('vasundhara_user', JSON.stringify(updatedUser));
+          } catch (apiError) {
+            // Token might be invalid/expired - the interceptor will handle refresh
+            // If refresh also fails, interceptor will clear storage and redirect
+            console.warn('Token validation failed, interceptor will handle refresh');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user:', parseError);
+          localStorage.removeItem('vasundhara_user');
+          localStorage.removeItem('vasundhara_access_token');
+          localStorage.removeItem('vasundhara_refresh_token');
+        }
       }
-    }
+
+      setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -112,10 +150,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      login, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      login,
       signup,
       logout,
       updateScore
@@ -132,3 +171,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

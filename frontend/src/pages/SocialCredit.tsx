@@ -6,9 +6,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Award, 
-  TrendingUp, 
+import {
+  Award,
+  TrendingUp,
   Trophy,
   Star,
   Gift,
@@ -19,14 +19,7 @@ import {
 import { motion } from 'framer-motion';
 
 const SocialCredit = () => {
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, navigate]);
+  const { user } = useAuth();
 
   if (!user) return null;
 
@@ -59,7 +52,7 @@ const SocialCredit = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -171,19 +164,17 @@ const SocialCredit = () => {
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
             <div className="space-y-3">
               {leaderboard.map((entry) => (
-                <div 
-                  key={entry.rank} 
-                  className={`flex items-center justify-between p-3 rounded-lg transition-all ${
-                    entry.isUser ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30'
-                  }`}
+                <div
+                  key={entry.rank}
+                  className={`flex items-center justify-between p-3 rounded-lg transition-all ${entry.isUser ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30'
+                    }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                      entry.rank === 1 ? 'bg-sun text-sun-foreground' :
-                      entry.rank === 2 ? 'bg-muted text-foreground' :
-                      entry.rank === 3 ? 'bg-earth text-earth-foreground' :
-                      'bg-muted text-foreground'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${entry.rank === 1 ? 'bg-sun text-sun-foreground' :
+                        entry.rank === 2 ? 'bg-muted text-foreground' :
+                          entry.rank === 3 ? 'bg-earth text-earth-foreground' :
+                            'bg-muted text-foreground'
+                      }`}>
                       {entry.rank}
                     </div>
                     <span className="text-2xl">{entry.avatar}</span>
@@ -223,7 +214,7 @@ const SocialCredit = () => {
                   </Badge>
                 </div>
                 <h4 className="font-semibold text-foreground mb-2">{reward.title}</h4>
-                <Button 
+                <Button
                   className={reward.available ? 'w-full gradient-eco shadow-eco' : 'w-full'}
                   variant={reward.available ? 'default' : 'outline'}
                   disabled={!reward.available}

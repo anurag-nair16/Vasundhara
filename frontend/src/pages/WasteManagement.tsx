@@ -7,10 +7,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { 
-  MapPin, 
-  Camera, 
-  Mic, 
+import {
+  MapPin,
+  Camera,
+  Mic,
   Send,
   Trash2,
   AlertCircle,
@@ -24,11 +24,10 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const WasteManagement = () => {
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [issueText, setIssueText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
- // const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   // const [stats, setStats] = useState({
   //   issues_reported: 0,
   //   resolved: 0,
@@ -40,13 +39,9 @@ const WasteManagement = () => {
   const [photoData, setPhotoData] = useState<File | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    } else {
-      fetchStats();
-      fetchReports();
-    }
-  }, [isAuthenticated, navigate]);
+    fetchStats();
+    fetchReports();
+  }, []);
 
   // const fetchStats = async () => {
   //   try {
@@ -57,7 +52,7 @@ const WasteManagement = () => {
   //   }
   //};
 
-    const [stats, setStats] = useState({
+  const [stats, setStats] = useState({
     total_reports: 0,
     resolved: 0,
     in_progress: 0,
@@ -171,7 +166,7 @@ const WasteManagement = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -225,7 +220,7 @@ const WasteManagement = () => {
               <Trash2 className="h-6 w-6 text-primary" />
               Report an Issue
             </h2>
-            
+
             <div className="space-y-4">
               <Textarea
                 placeholder="Describe the waste management issue (e.g., bin overflow, illegal dumping)..."
@@ -233,33 +228,33 @@ const WasteManagement = () => {
                 value={issueText}
                 onChange={(e) => setIssueText(e.target.value)}
               />
-              
+
               <div className="flex flex-wrap gap-3">
-                <Button 
-                  variant={photoData ? 'default' : 'outline'} 
+                <Button
+                  variant={photoData ? 'default' : 'outline'}
                   className="gap-2"
                   onClick={handleAddPhoto}
                 >
                   <Camera className="h-4 w-4" />
                   {photoData ? 'Photo Attached' : 'Add Photo'}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="gap-2"
                   onClick={() => setIsRecording(!isRecording)}
                 >
                   <Mic className={`h-4 w-4 ${isRecording ? 'text-destructive animate-pulse' : ''}`} />
                   {isRecording ? 'Recording...' : 'Voice Note'}
                 </Button>
-                <Button 
-                  variant={locationData ? 'default' : 'outline'} 
+                <Button
+                  variant={locationData ? 'default' : 'outline'}
                   className="gap-2"
                   onClick={handleGetLocation}
                 >
                   <MapPin className="h-4 w-4" />
                   {locationData ? 'Location Added' : 'Add Location'}
                 </Button>
-                <Button 
+                <Button
                   className="gradient-eco shadow-eco gap-2 ml-auto"
                   onClick={handleSubmitIssue}
                   disabled={isLoading || !issueText.trim()}
@@ -346,13 +341,12 @@ const WasteManagement = () => {
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-muted-foreground">Severity:</span>
                             <Badge
-                              className={`${
-                                report.severity === 'high'
+                              className={`${report.severity === 'high'
                                   ? 'bg-red-50 text-red-700 border-red-200'
                                   : report.severity === 'medium'
-                                  ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                  : 'bg-green-50 text-green-700 border-green-200'
-                              }`}
+                                    ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                    : 'bg-green-50 text-green-700 border-green-200'
+                                }`}
                               variant="outline"
                             >
                               <AlertCircle className="h-3 w-3 mr-1" />
@@ -370,21 +364,21 @@ const WasteManagement = () => {
                     )}
 
                     {/* Right side - Status */}
-                    <Badge 
+                    <Badge
                       variant={
-                        report.status === 'resolved' ? 'default' : 
-                        report.status === 'in-progress' ? 'secondary' : 
-                        'outline'
+                        report.status === 'resolved' ? 'default' :
+                          report.status === 'in-progress' ? 'secondary' :
+                            'outline'
                       }
                       className={
                         report.status === 'resolved' ? 'bg-success text-success-foreground' :
-                        report.status === 'in-progress' ? 'bg-warning text-warning-foreground' :
-                        ''
+                          report.status === 'in-progress' ? 'bg-warning text-warning-foreground' :
+                            ''
                       }
                     >
                       {report.status === 'resolved' ? <CheckCircle className="h-3 w-3 mr-1" /> :
-                       report.status === 'in-progress' ? <Clock className="h-3 w-3 mr-1" /> :
-                       <AlertCircle className="h-3 w-3 mr-1" />}
+                        report.status === 'in-progress' ? <Clock className="h-3 w-3 mr-1" /> :
+                          <AlertCircle className="h-3 w-3 mr-1" />}
                       {report.status}
                     </Badge>
                   </div>

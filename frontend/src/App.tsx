@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -28,12 +29,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/carbon" element={<CarbonTracking />} />
-              <Route path="/waste" element={<WasteManagement />} />
-              <Route path="/reports" element={<AllReports />} />
-              <Route path="/credits" element={<SocialCredit />} />
-              <Route path="/profile" element={<Profile />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/carbon" element={<ProtectedRoute><CarbonTracking /></ProtectedRoute>} />
+              <Route path="/waste" element={<ProtectedRoute><WasteManagement /></ProtectedRoute>} />
+              <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
+              <Route path="/credits" element={<ProtectedRoute><SocialCredit /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
@@ -44,3 +45,4 @@ const App = () => (
 );
 
 export default App;
+

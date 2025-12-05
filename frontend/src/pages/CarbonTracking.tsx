@@ -5,11 +5,11 @@ import Navigation from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { 
-  TrendingDown, 
-  Lightbulb, 
-  Car, 
-  Home, 
+import {
+  TrendingDown,
+  Lightbulb,
+  Car,
+  Home,
   ShoppingBag,
   Zap,
   Info
@@ -30,15 +30,6 @@ import {
 } from 'recharts';
 
 const CarbonTracking = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, navigate]);
-
   const monthlyData = [
     { month: 'Jan', emissions: 420 },
     { month: 'Feb', emissions: 380 },
@@ -86,7 +77,7 @@ const CarbonTracking = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -163,12 +154,12 @@ const CarbonTracking = () => {
                   <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.5rem'
-                    }} 
+                    }}
                   />
                   <Bar dataKey="emissions" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -199,12 +190,12 @@ const CarbonTracking = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.5rem'
-                    }} 
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>

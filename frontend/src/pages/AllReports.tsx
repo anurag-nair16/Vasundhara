@@ -9,15 +9,12 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AllReports = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) return navigate('/auth');
     fetchReports();
-  }, [isAuthenticated, navigate]);
+  }, []);
 
   const fetchReports = async () => {
     setLoading(true);
@@ -98,10 +95,9 @@ const AllReports = () => {
 
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">Severity:</span>
-                          <Badge className={`${
-                            r.severity === 'high' ? 'bg-red-50 text-red-700 border-red-200' :
-                            r.severity === 'medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-green-50 text-green-700 border-green-200'
-                          }`} variant="outline">
+                          <Badge className={`${r.severity === 'high' ? 'bg-red-50 text-red-700 border-red-200' :
+                              r.severity === 'medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 'bg-green-50 text-green-700 border-green-200'
+                            }`} variant="outline">
                             <AlertCircle className="h-3 w-3" /> {r.severity || 'N/A'}
                           </Badge>
                         </div>
