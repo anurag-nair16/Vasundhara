@@ -206,29 +206,40 @@ def create_waste_report(request):
             waste_report.save()
             print(f"Photo saved to: {waste_report.photo.path}")
             
-            # Send image to environment_classifier for classification
+            # Send image and description to environment_classifier for validation
             try:
                 # Environment classifier server (use local testing port 8002)
-                classifier_url = "http://localhost:8002/classify"
-                print(f"Calling classifier at: {classifier_url}")
+                validator_url = "http://localhost:8002/validate"
+                print(f"Calling validator at: {validator_url}")
                 with open(waste_report.photo.path, 'rb') as img_file:
                     files = {'image': img_file}
-                    classifier_response = requests.post(classifier_url, files=files, timeout=30)
+                    data = {'description': request.data.get('description', '')}
+                    validator_response = requests.post(validator_url, files=files, data=data, timeout=60)
                 
-                print(f"Classifier response status: {classifier_response.status_code}")
-                print(f"Classifier response: {classifier_response.text}")
+                print(f"Validator response status: {validator_response.status_code}")
+                print(f"Validator response: {validator_response.text}")
                 
-                if classifier_response.status_code == 200:
-                    classification_data = classifier_response.json()
-                    print(f"Classification data: {classification_data}")
-                    # Save classification results
-                    waste_report.category = classification_data.get('category')
-                    waste_report.severity = classification_data.get('severity')
-                    waste_report.response_time = classification_data.get('response_time')
-                    print(f"Saved: category={waste_report.category}, severity={waste_report.severity}")
+                if validator_response.status_code == 200:
+                    validation_data = validator_response.json()
+                    print(f"Validation data: {validation_data}")
+                    
+                    if validation_data.get('is_valid', False):
+                        # Valid report - save classification results
+                        waste_report.category = validation_data.get('category')
+                        waste_report.severity = validation_data.get('severity')
+                        waste_report.response_time = validation_data.get('response_time')
+                        waste_report.status = 'pending'
+                        print(f"Valid report: category={waste_report.category}, severity={waste_report.severity}")
+                    else:
+                        # Invalid report - mark as invalid
+                        waste_report.status = 'invalid'
+                        print(f"Invalid report: {validation_data.get('reason', 'Unknown reason')}")
+                else:
+                    # Classifier returned error, mark as pending for manual review
+                    print(f"Validator error, keeping as pending")
             except requests.exceptions.RequestException as e:
-                # If classifier fails, log error but continue
-                print(f"Error calling environment classifier: {str(e)}")
+                # If validator fails, log error but mark as pending for manual review
+                print(f"Error calling environment validator: {str(e)}")
                 pass
         else:
             print("No photo in request.FILES")

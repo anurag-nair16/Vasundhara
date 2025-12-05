@@ -48,6 +48,7 @@ class WasteReport(models.Model):
         ('pending', 'Pending'),
         ('in-progress', 'In Progress'),
         ('resolved', 'Resolved'),
+        ('invalid', 'Invalid'),
     )
 
     CATEGORY_CHOICES = (

@@ -18,7 +18,8 @@ import {
   Clock,
   TrendingUp,
   Loader,
-  Zap
+  Zap,
+  XCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -392,17 +393,20 @@ const WasteManagement = () => {
                       variant={
                         report.status === 'resolved' ? 'default' :
                           report.status === 'in-progress' ? 'secondary' :
-                            'outline'
+                            report.status === 'invalid' ? 'destructive' :
+                              'outline'
                       }
                       className={
                         report.status === 'resolved' ? 'bg-success text-success-foreground' :
                           report.status === 'in-progress' ? 'bg-warning text-warning-foreground' :
-                            ''
+                            report.status === 'invalid' ? 'bg-red-500 text-white' :
+                              ''
                       }
                     >
                       {report.status === 'resolved' ? <CheckCircle className="h-3 w-3 mr-1" /> :
                         report.status === 'in-progress' ? <Clock className="h-3 w-3 mr-1" /> :
-                          <AlertCircle className="h-3 w-3 mr-1" />}
+                          report.status === 'invalid' ? <XCircle className="h-3 w-3 mr-1" /> :
+                            <AlertCircle className="h-3 w-3 mr-1" />}
                       {report.status}
                     </Badge>
                   </div>
