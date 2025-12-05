@@ -18,12 +18,14 @@ import { toast } from 'sonner';
 import { Leaf, Mail, Lock, User, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LanguageCode } from '@/services/translationService';
+import AadharVerification from '@/components/AadharVerification';
 
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
   const { setLanguage, supportedLanguages } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [showAadharVerification, setShowAadharVerification] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: '', password: '', language: 'en' as LanguageCode });
   const [signupData, setSignupData] = useState({
@@ -72,14 +74,27 @@ const Auth = () => {
       setLanguage(signupData.language);
 
       await signup(signupData.name, signupData.email, signupData.password, 'citizen');
-      toast.success('Account created successfully!');
-      navigate('/dashboard');
+      toast.success('Account created! Please verify your Aadhar.');
+      // Show Aadhar verification after successful signup
+      setShowAadharVerification(true);
     } catch (error: any) {
       toast.error(error.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show Aadhar verification after signup
+  if (showAadharVerification) {
+    return (
+      <AadharVerification
+        onVerified={() => {
+          toast.success('Welcome to Vasundhara!');
+          navigate('/dashboard');
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-hero">
