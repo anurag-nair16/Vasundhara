@@ -5,29 +5,43 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Leaf, Mail, Lock, User } from 'lucide-react';
+import { Leaf, Mail, Lock, User, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LanguageCode } from '@/services/translationService';
 
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
+  const { setLanguage, supportedLanguages } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ 
-    name: '', 
-    email: '', 
-    password: '', 
-    confirmPassword: '' 
+
+  const [loginData, setLoginData] = useState({ email: '', password: '', language: 'en' as LanguageCode });
+  const [signupData, setSignupData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    language: 'en' as LanguageCode
   });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
+      // Set the language preference before login
+      setLanguage(loginData.language);
+
       await login(loginData.email, loginData.password);
       toast.success('Welcome back to Vasundhara!');
       navigate('/dashboard');
@@ -40,7 +54,7 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (signupData.password !== signupData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -50,10 +64,13 @@ const Auth = () => {
       toast.error('Please enter your full name');
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
+      // Set the language preference before signup
+      setLanguage(signupData.language);
+
       await signup(signupData.name, signupData.email, signupData.password, 'citizen');
       toast.success('Account created successfully!');
       navigate('/dashboard');
@@ -121,8 +138,33 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
+                <div className="space-y-2">
+                  <Label htmlFor="login-language">Preferred Language</Label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                    <Select
+                      value={loginData.language}
+                      onValueChange={(value) => setLoginData({ ...loginData, language: value as LanguageCode })}
+                    >
+                      <SelectTrigger className="pl-10">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {supportedLanguages.map((lang) => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            <span className="flex items-center gap-2">
+                              <span>{lang.flag}</span>
+                              <span>{lang.nativeName}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
                   className="w-full gradient-eco shadow-eco"
                   disabled={isLoading}
                 >
@@ -166,6 +208,31 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="signup-language">Preferred Language</Label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                    <Select
+                      value={signupData.language}
+                      onValueChange={(value) => setSignupData({ ...signupData, language: value as LanguageCode })}
+                    >
+                      <SelectTrigger className="pl-10">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {supportedLanguages.map((lang) => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            <span className="flex items-center gap-2">
+                              <span>{lang.flag}</span>
+                              <span>{lang.nativeName}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -197,8 +264,8 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full gradient-eco shadow-eco"
                   disabled={isLoading}
                 >
@@ -218,3 +285,4 @@ const Auth = () => {
 };
 
 export default Auth;
+

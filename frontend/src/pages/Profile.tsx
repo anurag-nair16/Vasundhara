@@ -1,14 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
-import apiClient from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   User,
   Mail,
@@ -26,6 +33,7 @@ import { toast } from 'sonner';
 const Profile = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, supportedLanguages } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -140,10 +148,24 @@ const Profile = () => {
                   <Globe className="h-5 w-5 text-primary" />
                   <div>
                     <p className="font-medium text-foreground">Language</p>
-                    <p className="text-sm text-muted-foreground">Current: English</p>
+                    <p className="text-sm text-muted-foreground">Select your preferred language</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">Change</Button>
+                <Select value={language} onValueChange={(val) => setLanguage(val as any)}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {supportedLanguages.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        <span className="flex items-center gap-2">
+                          <span>{lang.flag}</span>
+                          <span>{lang.nativeName}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </Card>

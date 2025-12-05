@@ -2,12 +2,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { 
-  Home, 
-  BarChart3, 
-  Trash2, 
-  Award, 
-  User, 
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import {
+  Home,
+  BarChart3,
+  Trash2,
+  Award,
+  User,
   LogOut,
   Moon,
   Sun,
@@ -15,8 +17,9 @@ import {
 } from 'lucide-react';
 
 const Navigation = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,7 +37,7 @@ const Navigation = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Vasundhara 2.0</h1>
-              <p className="text-xs text-muted-foreground">Agentic Civic Platform</p>
+              <p className="text-xs text-muted-foreground">{t('Agentic Civic Platform')}</p>
             </div>
           </Link>
 
@@ -44,53 +47,56 @@ const Navigation = () => {
                 <Link to="/dashboard">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <Home className="h-4 w-4" />
-                    Dashboard
+                    {t('Dashboard')}
                   </Button>
                 </Link>
                 <Link to="/carbon">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    Carbon
+                    {t('Carbon')}
                   </Button>
                 </Link>
                 <Link to="/waste">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <Trash2 className="h-4 w-4" />
-                    Waste
+                    {t('Waste')}
                   </Button>
                 </Link>
                 <Link to="/reports">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <Trash2 className="h-4 w-4" />
-                    Reports
+                    {t('Reports')}
                   </Button>
                 </Link>
                 <Link to="/credits">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <Award className="h-4 w-4" />
-                    Credits
+                    {t('Credits')}
                   </Button>
                 </Link>
                 <Link to="/profile">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
-                    Profile
+                    {t('Profile')}
                   </Button>
                 </Link>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleLogout}
                   className="gap-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {t('Logout')}
                 </Button>
               </>
             )}
-            
-            <Button 
-              variant="outline" 
+
+            {/* Language Selector */}
+            <LanguageSelector />
+
+            <Button
+              variant="outline"
               size="icon"
               onClick={toggleTheme}
               className="rounded-full"
@@ -101,7 +107,7 @@ const Navigation = () => {
             {!isAuthenticated && (
               <Link to="/auth">
                 <Button className="gradient-eco">
-                  Sign In
+                  {t('Sign In')}
                 </Button>
               </Link>
             )}
