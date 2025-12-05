@@ -201,33 +201,44 @@ def create_waste_report(request):
 
         # Handle photo upload
         if 'photo' in request.FILES:
+            print(f"Photo received: {request.FILES['photo'].name}")
             waste_report.photo = request.FILES['photo']
             waste_report.save()
+            print(f"Photo saved to: {waste_report.photo.path}")
             
             # Send image to environment_classifier for classification
             try:
                 # Environment classifier server (use local testing port 8002)
                 classifier_url = "http://localhost:8002/classify"
+                print(f"Calling classifier at: {classifier_url}")
                 with open(waste_report.photo.path, 'rb') as img_file:
                     files = {'image': img_file}
                     classifier_response = requests.post(classifier_url, files=files, timeout=30)
                 
+                print(f"Classifier response status: {classifier_response.status_code}")
+                print(f"Classifier response: {classifier_response.text}")
+                
                 if classifier_response.status_code == 200:
                     classification_data = classifier_response.json()
+                    print(f"Classification data: {classification_data}")
                     # Save classification results
                     waste_report.category = classification_data.get('category')
                     waste_report.severity = classification_data.get('severity')
                     waste_report.response_time = classification_data.get('response_time')
+                    print(f"Saved: category={waste_report.category}, severity={waste_report.severity}")
             except requests.exceptions.RequestException as e:
                 # If classifier fails, log error but continue
                 print(f"Error calling environment classifier: {str(e)}")
                 pass
+        else:
+            print("No photo in request.FILES")
 
         # Handle voice note upload
         if 'voice_note' in request.FILES:
             waste_report.voice_note = request.FILES['voice_note']
 
         waste_report.save()
+        print(f"Final report saved with category={waste_report.category}, severity={waste_report.severity}")
 
         # Update user profile - increment issues_reported
         profile = request.user.userprofile

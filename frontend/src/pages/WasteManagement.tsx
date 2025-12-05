@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Navigation from '@/components/Navigation';
@@ -25,15 +25,9 @@ import { toast } from 'sonner';
 
 const WasteManagement = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [issueText, setIssueText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [stats, setStats] = useState({
-  //   issues_reported: 0,
-  //   resolved: 0,
-  //   in_progress: 0,
-  //   pending: 0,
-  // });
   const [recentReports, setRecentReports] = useState<any[]>([]);
   const [locationData, setLocationData] = useState<any>(null);
   const [photoData, setPhotoData] = useState<File | null>(null);
@@ -110,17 +104,16 @@ const WasteManagement = () => {
   };
 
   const handleAddPhoto = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.onchange = (e: any) => {
-      const file = e.target.files[0];
-      if (file) {
-        setPhotoData(file);
-        toast.info('Photo attached: ' + file.name);
-      }
-    };
-    fileInput.click();
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log('File selected:', file.name, file.size, file.type);
+      setPhotoData(file);
+      toast.info('Photo attached: ' + file.name);
+    }
   };
 
   const handleSubmitIssue = async () => {
@@ -138,28 +131,49 @@ const WasteManagement = () => {
         formData.append('location', JSON.stringify(locationData));
       }
       if (photoData) {
-        formData.append('photo', photoData);
+        // Explicitly append with filename for better backend compatibility
+        formData.append('photo', photoData, photoData.name);
+        console.log('Photo attached:', photoData.name, 'Size:', photoData.size, 'Type:', photoData.type);
+      } else {
+        console.log('No photo attached');
       }
 
-      // Don't set Content-Type header - axios will auto-set it with proper boundary
-      const response = await apiClient.post('/auth/report/', formData);
+      // Debug: Log all form data entries
+      console.log('FormData entries:');
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
 
-      if (response.status === 201) {
+      // Use native fetch for FormData to ensure correct multipart encoding
+      const token = localStorage.getItem('vasundhara_access_token');
+      const response = await fetch('http://localhost:8000/auth/report/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type - browser will set it with boundary
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
         toast.success('Issue reported successfully! Crew dispatched.');
         setIssueText('');
         setLocationData(null);
         setPhotoData(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         fetchStats();
         fetchReports();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit report');
       }
     } catch (error: any) {
       console.error('Failed to submit report:', error);
-      console.error('Response data:', error.response?.data);
-      const errorMessage = error.response?.data?.error ||
-        error.response?.data?.detail ||
-        (typeof error.response?.data === 'string' ? error.response.data : null) ||
-        'Failed to submit report. Please try again.';
-      toast.error(errorMessage);
+      toast.error(error.message || 'Failed to submit report. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -167,6 +181,14 @@ const WasteManagement = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Hidden file input for photo upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.gif,.webp,.heic"
+        style={{ display: 'none' }}
+      />
       <Navigation />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">

@@ -7,11 +7,12 @@ import tempfile
 import os
 import re
 import time
+import traceback
 
 # Initialize client
 genai.configure(api_key="AIzaSyCVzn5jzU_P8DctTeWreVek9tw_nh4b4Ig")
-# Use Gemini 2.5 Flash - stable model with vision support
-MODEL_NAME = "models/gemini-2.5-flash"
+# Use Gemini 2.0 Flash - latest model with vision support
+MODEL_NAME = "gemini-2.0-flash"
 
 app = FastAPI()
 
@@ -157,6 +158,8 @@ Example: {"category": "road", "severity": "high"}"""
         }, 500)
     
     except Exception as e:
+        print(f"Classification error: {str(e)}")
+        traceback.print_exc()
         return JSONResponse({
             "error": "Classification failed",
             "details": str(e)
