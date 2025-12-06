@@ -10,9 +10,9 @@ import time
 import traceback
 
 # Initialize client
-genai.configure(api_key="AIzaSyBfe9T7BefMy3eRxcY3ilgE6FQ5viuMfdw")
+genai.configure(api_key="AIzaSyDxrQVZCs2q_Z7HSmpuf0lYfZehcjreNq4")
 # Use Gemini 2.0 Flash - latest model with vision support
-MODEL_NAME = "gemini-2.0-flash"
+MODEL_NAME = "gemini-2.5-flash"
 
 app = FastAPI()
 
@@ -174,157 +174,241 @@ Example: {"category": "road", "severity": "high"}"""
                 pass
 
 
+# @app.post("/validate")
+# async def validate_report(image: UploadFile = File(...), description: str = Form(...)):
+#     """Validate if the image is environment-related and matches the description"""
+#     tmp_path = None
+#     try:
+#         genai.GenerativeModel("gemini-2.0-flash").generate_content("hello")
+
+#         # Read image bytes
+#         img_bytes = await image.read()
+        
+#         # Validate image
+#         if len(img_bytes) == 0:
+#             return JSONResponse({"error": "Empty image file"}, 400)
+        
+#         # Save image temporarily
+#         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+#             tmp.write(img_bytes)
+#             tmp_path = tmp.name
+        
+#         # Upload to Gemini
+#         uploaded_file = genai.upload_file(tmp_path)
+
+
+        
+#         # Wait for file processing
+#         while uploaded_file.state.name == "PROCESSING":
+#             time.sleep(1)
+#             uploaded_file = genai.get_file(uploaded_file.name)
+        
+#         if uploaded_file.state.name == "FAILED":
+#             return JSONResponse({"error": "File processing failed"}, 500)
+        
+#         # Validation prompt
+#         prompt = f"""Analyze this image and the given description to validate if this is a legitimate civic/environmental issue report.
+
+# USER'S DESCRIPTION: "{description}"
+
+# You must check:
+# 1. Is the image related to an environmental/civic issue? Valid categories are:
+#    - garbage: litter, trash piles, waste dumping, overflowing bins
+#    - road: potholes, damaged roads, broken pavement, road damage
+#    - fire: fires, smoke from fire, burning
+#    - water: leaks, flooding, water damage, broken pipes, water pollution
+#    - construction: illegal construction, building issues, debris, structural damage
+#    - air: air pollution, dust clouds, industrial smoke (non-fire)
+
+# 2. Does the user's description reasonably match what is shown in the image?
+#    - The description should describe the same type of issue visible in the image
+#    - Minor wording differences are acceptable, but the core issue must match
+
+# Return ONLY a valid JSON object with no additional text:
+
+# If VALID (image is environment-related AND description matches):
+# {{"is_valid": true, "category": "one_of_the_categories", "severity": "high_medium_or_low", "reason": "brief explanation"}}
+
+# If INVALID (not environment-related OR description doesn't match):
+# {{"is_valid": false, "reason": "clear explanation of why it's invalid"}}
+
+# Severity levels:
+# - high: immediate danger, urgent action needed
+# - medium: significant issue, needs attention soon  
+# - low: minor issue, routine maintenance"""
+
+#         # Generate content with retry logic
+#         max_retries = 3
+#         retry_delay = 2
+#         response = None
+        
+#         for attempt in range(max_retries):
+#             try:
+#                 model = genai.GenerativeModel(MODEL_NAME)
+#                 response = model.generate_content([uploaded_file, prompt])
+#                 break
+#             except Exception as api_error:
+#                 error_str = str(api_error)
+#                 if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+#                     if attempt < max_retries - 1:
+#                         delay_match = re.search(r'retry in (\d+\.?\d*)', error_str.lower())
+#                         if delay_match:
+#                             retry_delay = float(delay_match.group(1))
+#                         time.sleep(retry_delay)
+#                         continue
+#                     else:
+#                         return JSONResponse({
+#                             "error": "API quota exceeded",
+#                             "message": "Please wait a moment and try again",
+#                             "retry_after_seconds": retry_delay
+#                         }, 429)
+#                 else:
+#                     raise
+        
+#         if response is None:
+#             return JSONResponse({"error": "Failed to get response from validator"}, 500)
+        
+#         # Extract and clean response
+#         raw_text = response.text.strip()
+#         raw_text = re.sub(r'```json\s*|\s*```', '', raw_text)
+#         raw_text = raw_text.strip()
+        
+#         # Parse JSON
+#         try:
+#             data = json.loads(raw_text)
+#         except json.JSONDecodeError:
+#             json_match = re.search(r'\{[^}]+\}', raw_text)
+#             if json_match:
+#                 data = json.loads(json_match.group())
+#             else:
+#                 return JSONResponse({
+#                     "error": "Invalid JSON response from AI",
+#                     "raw_response": raw_text
+#                 }, 500)
+        
+#         is_valid = data.get("is_valid", False)
+        
+#         if is_valid:
+#             # Validate category and severity
+#             category = data.get("category", "").lower().strip()
+#             if category not in CATEGORIES:
+#                 return {"is_valid": False, "reason": f"Invalid category detected: {category}"}
+            
+#             severity = data.get("severity", "").lower().strip()
+#             if severity not in ["low", "medium", "high"]:
+#                 severity = "medium"  # Default to medium if not valid
+            
+#             response_time = get_response_time(severity)
+            
+#             return {
+#                 "is_valid": True,
+#                 "category": category,
+#                 "severity": severity,
+#                 "response_time": response_time,
+#                 "reason": data.get("reason", "Validation passed")
+#             }
+#         else:
+#             return {
+#                 "is_valid": False,
+#                 "reason": data.get("reason", "Image is not related to environmental issues or description doesn't match")
+#             }
+    
+#     except Exception as e:
+#         print(f"Validation error: {str(e)}")
+#         traceback.print_exc()
+#         return JSONResponse({
+#             "error": "Validation failed",
+#             "details": str(e)
+#         }, 500)
+    
+#     finally:
+#         if tmp_path and os.path.exists(tmp_path):
+#             try:
+#                 os.unlink(tmp_path)
+#             except:
+#                 pass
 @app.post("/validate")
 async def validate_report(image: UploadFile = File(...), description: str = Form(...)):
-    """Validate if the image is environment-related and matches the description"""
-    tmp_path = None
+    """Validate if the image is environment-related and matches the description using base64"""
     try:
-        # Read image bytes
+        genai.GenerativeModel("gemini-2.0-flash").generate_content("hello")
+
         img_bytes = await image.read()
-        
-        # Validate image
-        if len(img_bytes) == 0:
+        if not img_bytes:
             return JSONResponse({"error": "Empty image file"}, 400)
-        
-        # Save image temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-            tmp.write(img_bytes)
-            tmp_path = tmp.name
-        
-        # Upload to Gemini
-        uploaded_file = genai.upload_file(tmp_path)
-        
-        # Wait for file processing
-        while uploaded_file.state.name == "PROCESSING":
-            time.sleep(1)
-            uploaded_file = genai.get_file(uploaded_file.name)
-        
-        if uploaded_file.state.name == "FAILED":
-            return JSONResponse({"error": "File processing failed"}, 500)
-        
+
+        # Convert image to base64
+        import base64, mimetypes
+        img_b64 = base64.b64encode(img_bytes).decode()
+
+        # Detect MIME type safely
+        mime_type = (
+            image.content_type 
+            or mimetypes.guess_type(image.filename)[0] 
+            or "image/jpeg"
+        )
+
         # Validation prompt
-        prompt = f"""Analyze this image and the given description to validate if this is a legitimate civic/environmental issue report.
+        prompt = f"""
+Analyze this image and the following description to validate if it represents a genuine civic/environmental issue.
 
-USER'S DESCRIPTION: "{description}"
+DESCRIPTION: "{description}"
 
-You must check:
-1. Is the image related to an environmental/civic issue? Valid categories are:
-   - garbage: litter, trash piles, waste dumping, overflowing bins
-   - road: potholes, damaged roads, broken pavement, road damage
-   - fire: fires, smoke from fire, burning
-   - water: leaks, flooding, water damage, broken pipes, water pollution
-   - construction: illegal construction, building issues, debris, structural damage
-   - air: air pollution, dust clouds, industrial smoke (non-fire)
+Return ONLY JSON:
+{{
+ "is_valid": true/false,
+ "category": "garbage/road/fire/water/construction/air",
+ "severity": "low/medium/high",
+ "reason": "explanation"
+}}
+"""
 
-2. Does the user's description reasonably match what is shown in the image?
-   - The description should describe the same type of issue visible in the image
-   - Minor wording differences are acceptable, but the core issue must match
+        model = genai.GenerativeModel(MODEL_NAME)
 
-Return ONLY a valid JSON object with no additional text:
+        response = model.generate_content([
+            {"mime_type": mime_type, "data": img_b64},
+            prompt
+        ])
 
-If VALID (image is environment-related AND description matches):
-{{"is_valid": true, "category": "one_of_the_categories", "severity": "high_medium_or_low", "reason": "brief explanation"}}
+        raw = response.text.strip()
+        raw = raw.replace("```json", "").replace("```", "").strip()
 
-If INVALID (not environment-related OR description doesn't match):
-{{"is_valid": false, "reason": "clear explanation of why it's invalid"}}
+        match = re.search(r"\{.*\}", raw, flags=re.DOTALL)
+        if not match:
+            return JSONResponse({"error": "Model returned invalid JSON", "raw_response": raw}, 500)
 
-Severity levels:
-- high: immediate danger, urgent action needed
-- medium: significant issue, needs attention soon  
-- low: minor issue, routine maintenance"""
+        data = json.loads(match.group())
 
-        # Generate content with retry logic
-        max_retries = 3
-        retry_delay = 2
-        response = None
-        
-        for attempt in range(max_retries):
-            try:
-                model = genai.GenerativeModel(MODEL_NAME)
-                response = model.generate_content([uploaded_file, prompt])
-                break
-            except Exception as api_error:
-                error_str = str(api_error)
-                if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
-                    if attempt < max_retries - 1:
-                        delay_match = re.search(r'retry in (\d+\.?\d*)', error_str.lower())
-                        if delay_match:
-                            retry_delay = float(delay_match.group(1))
-                        time.sleep(retry_delay)
-                        continue
-                    else:
-                        return JSONResponse({
-                            "error": "API quota exceeded",
-                            "message": "Please wait a moment and try again",
-                            "retry_after_seconds": retry_delay
-                        }, 429)
-                else:
-                    raise
-        
-        if response is None:
-            return JSONResponse({"error": "Failed to get response from validator"}, 500)
-        
-        # Extract and clean response
-        raw_text = response.text.strip()
-        raw_text = re.sub(r'```json\s*|\s*```', '', raw_text)
-        raw_text = raw_text.strip()
-        
-        # Parse JSON
-        try:
-            data = json.loads(raw_text)
-        except json.JSONDecodeError:
-            json_match = re.search(r'\{[^}]+\}', raw_text)
-            if json_match:
-                data = json.loads(json_match.group())
-            else:
-                return JSONResponse({
-                    "error": "Invalid JSON response from AI",
-                    "raw_response": raw_text
-                }, 500)
-        
-        is_valid = data.get("is_valid", False)
-        
-        if is_valid:
-            # Validate category and severity
-            category = data.get("category", "").lower().strip()
+        if data.get("is_valid"):
+            category = data.get("category", "").lower()
+            severity = data.get("severity", "").lower()
+
             if category not in CATEGORIES:
-                return {"is_valid": False, "reason": f"Invalid category detected: {category}"}
-            
-            severity = data.get("severity", "").lower().strip()
+                return {"is_valid": False, "reason": f"Invalid category: {category}"}
+
             if severity not in ["low", "medium", "high"]:
-                severity = "medium"  # Default to medium if not valid
-            
+                severity = "medium"
+
             response_time = get_response_time(severity)
-            
+
             return {
                 "is_valid": True,
                 "category": category,
                 "severity": severity,
                 "response_time": response_time,
-                "reason": data.get("reason", "Validation passed")
+                "reason": data.get("reason", "")
             }
-        else:
-            return {
-                "is_valid": False,
-                "reason": data.get("reason", "Image is not related to environmental issues or description doesn't match")
-            }
-    
-    except Exception as e:
-        print(f"Validation error: {str(e)}")
-        traceback.print_exc()
-        return JSONResponse({
-            "error": "Validation failed",
-            "details": str(e)
-        }, 500)
-    
-    finally:
-        if tmp_path and os.path.exists(tmp_path):
-            try:
-                os.unlink(tmp_path)
-            except:
-                pass
 
+        return {
+            "is_valid": False,
+            "reason": data.get("reason", "Description does not match the image")
+        }
+
+    except Exception as e:
+        print("Validation error:", e)
+        traceback.print_exc()
+        return JSONResponse({"error": "Validation failed", "details": str(e)}, 500)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

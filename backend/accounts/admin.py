@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import UserProfile, ModelOutput
 from .models import WasteReport
+from .models import CivicIssue
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -34,3 +35,9 @@ class WasteReportAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+
+@admin.register(CivicIssue)
+class CivicIssueAdmin(admin.ModelAdmin):
+    list_display = ("id", "issue", "name", "phone", "address", "created_at")
+    search_fields = ("issue", "name", "phone", "address")
+    list_filter = ("issue", "created_at")

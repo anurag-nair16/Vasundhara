@@ -4,8 +4,10 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+
 
 class SignupView(APIView):
     def post(self, request):
@@ -168,6 +170,7 @@ class WasteReportViewSet(viewsets.ModelViewSet):
         # Auto-assign the report to the current user
         serializer.save(user=self.request.user)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_waste_report(request):
@@ -175,21 +178,21 @@ def create_waste_report(request):
     try:
         import requests
         import threading
-        
-        # Parse location data if provided
+        import json
+
+        # Parse location data
         location_data = request.data.get('location', {})
         if isinstance(location_data, str):
-            import json
             try:
                 location_data = json.loads(location_data)
             except:
                 location_data = {}
-        
+
         latitude = location_data.get('lat') if isinstance(location_data, dict) else None
         longitude = location_data.get('lon') if isinstance(location_data, dict) else None
         location_address = location_data.get('address') if isinstance(location_data, dict) else location_data
 
-        # Create waste report immediately with 'pending' status
+        # Create the waste report immediately
         waste_report = WasteReport.objects.create(
             user=request.user,
             description=request.data.get('description'),
@@ -216,38 +219,43 @@ def create_waste_report(request):
             waste_report.voice_note = request.FILES['voice_note']
             waste_report.save()
 
-        # Update user profile - increment issues_reported
+        # Update user profile
         profile = request.user.userprofile
         profile.issues_reported += 1
         profile.save()
 
-        # Start background validation if photo exists
+        # START BACKGROUND VALIDATION IF PHOTO EXISTS
         if photo_path:
             description = request.data.get('description', '')
             report_id = waste_report.id
-            
+
             def validate_in_background(report_id, photo_path, description):
                 """Run validation in background thread"""
                 try:
                     print(f"[BG] Starting validation for report {report_id}")
-                    validator_url = "http://localhost:8002/validate"
-                    
+                    validator_url = "http://localhost:8001/validate"
+
+                    # FIX: Keep file open during the request
                     with open(photo_path, 'rb') as img_file:
                         files = {'image': img_file}
                         data = {'description': description}
-                        validator_response = requests.post(validator_url, files=files, data=data, timeout=120)
-                    
+                        validator_response = requests.post(
+                            validator_url,
+                            files=files,
+                            data=data,
+                            timeout=120
+                        )
+
                     print(f"[BG] Validator response: {validator_response.status_code}")
-                    
+
                     if validator_response.status_code == 200:
                         validation_data = validator_response.json()
                         print(f"[BG] Validation data: {validation_data}")
-                        
-                        # Update the report with validation results
+
                         from .models import WasteReport
                         try:
                             report = WasteReport.objects.get(id=report_id)
-                            
+
                             if validation_data.get('is_valid', False):
                                 report.category = validation_data.get('category')
                                 report.severity = validation_data.get('severity')
@@ -257,16 +265,21 @@ def create_waste_report(request):
                             else:
                                 report.status = 'invalid'
                                 print(f"[BG] Invalid: {validation_data.get('reason')}")
-                            
+
                             report.save()
                         except WasteReport.DoesNotExist:
                             print(f"[BG] Report {report_id} not found")
+
                     else:
                         print(f"[BG] Validator error: {validator_response.status_code}")
-                        
+                        try:
+                            print(f"[BG] Error details: {validator_response.json()}")
+                        except:
+                            print(f"[BG] Error text: {validator_response.text}")
+
                 except Exception as e:
                     print(f"[BG] Validation error: {str(e)}")
-            
+
             # Start background thread
             thread = threading.Thread(
                 target=validate_in_background,
@@ -274,6 +287,7 @@ def create_waste_report(request):
             )
             thread.daemon = True
             thread.start()
+
             print(f"[MAIN] Background validation started for report {report_id}")
 
         serializer = WasteReportSerializer(waste_report)
@@ -281,6 +295,7 @@ def create_waste_report(request):
             "message": "Report submitted! Validation in progress...",
             "report": serializer.data
         }, status=status.HTTP_201_CREATED)
+
     except Exception as e:
         return Response({"error": str(e)}, status=400)
 
@@ -316,3 +331,94 @@ def get_report_stats(request):
         }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import CivicIssue, WasteReport
+from .serializers import CivicIssueSerializer, WasteReportSerializer
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_all_reports(request):
+    """
+    Get all reports (both WasteReport and CivicIssue) combined.
+    Returns them grouped by type with timestamps for sorting.
+    """
+    try:
+        # Get all waste reports
+        waste_reports = WasteReport.objects.all().order_by('-created_at')
+        waste_serializer = WasteReportSerializer(waste_reports, many=True)
+        waste_data = waste_serializer.data
+        
+        # Add type field to waste reports
+        for report in waste_data:
+            report['report_type'] = 'waste'
+        
+        # Get all civic issues
+        civic_issues = CivicIssue.objects.all().order_by('-created_at')
+        civic_serializer = CivicIssueSerializer(civic_issues, many=True)
+        civic_data = civic_serializer.data
+        
+        # Add type field to civic issues and map fields for consistency
+        for issue in civic_data:
+            issue['report_type'] = 'civic'
+            # Map civic issue fields to match waste report structure for frontend compatibility
+            issue['category'] = issue.get('issue', 'Unknown')
+            issue['severity'] = 'medium'  # Default severity for civic issues
+            issue['status'] = 'pending'  # Default status for civic issues
+            issue['username'] = issue.get('name', 'Anonymous')
+            issue['description'] = issue.get('description', '')
+            issue['location'] = issue.get('address', 'Location not provided')
+        
+        # Combine and sort by created_at
+        all_reports = waste_data + civic_data
+        all_reports.sort(key=lambda x: x['created_at'], reverse=True)
+        
+        return Response({
+            "count": len(all_reports),
+            "reports": all_reports
+        }, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny]) 
+def receive_issue(request):
+    """
+    Receives structured output from Vapi (via Node.js) 
+    and saves to SQLite as a CivicIssue.
+    """
+    try:
+        data = request.data
+
+        # Validation
+        required_fields = ["issue", "description", "name", "phone", "address"]
+        missing = [field for field in required_fields if field not in data]
+
+        if missing:
+            return Response({
+                "error": "Missing required fields",
+                "missing": missing
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Save to SQLite
+        issue = CivicIssue.objects.create(
+            issue=data["issue"],
+            description=data["description"],
+            name=data["name"],
+            phone=data["phone"],
+            address=data["address"]
+        )
+
+        return Response({
+            "status": "saved",
+            "id": issue.id
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

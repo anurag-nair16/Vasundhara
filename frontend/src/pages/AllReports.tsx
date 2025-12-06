@@ -19,7 +19,7 @@ const AllReports = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/auth/reports/');
+      const res = await apiClient.get('/auth/all-reports/');
       setReports(res.data.reports || []);
     } catch (e) {
       console.error('Failed to fetch reports', e);
@@ -31,7 +31,7 @@ const AllReports = () => {
   const grouped = useMemo(() => {
     const map: Record<string, any[]> = {};
     for (const r of reports) {
-      const key = r.category || 'uncategorized';
+      const key = r.category || r.issue || 'uncategorized';
       if (!map[key]) map[key] = [];
       map[key].push(r);
     }
@@ -79,11 +79,12 @@ const AllReports = () => {
                           <p className="text-sm text-muted-foreground truncate">{r.description}</p>
                           <p className="text-xs text-muted-foreground mt-1">{r.location || 'Location not provided'}</p>
                           <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</p>
+                          {r.phone && <p className="text-xs text-muted-foreground">Phone: {r.phone}</p>}
                         </div>
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
                           {r.category ? (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
                               <Zap className="h-3 w-3" /> {r.category}
@@ -91,6 +92,9 @@ const AllReports = () => {
                           ) : (
                             <Badge variant="outline">Uncategorized</Badge>
                           )}
+                          <Badge variant="secondary" className="text-xs">
+                            {r.report_type === 'civic' ? 'Civic Issue' : 'Waste Report'}
+                          </Badge>
                         </div>
 
                         <div className="flex items-center gap-2">

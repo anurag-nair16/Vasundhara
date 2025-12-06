@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserProfile, ModelOutput, WasteReport
+from .models import UserProfile, ModelOutput, WasteReport, CivicIssue
 from django.contrib.auth.models import User
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -25,3 +25,9 @@ class WasteReportSerializer(serializers.ModelSerializer):
                   'response_time', 'created_at', 'updated_at']
         read_only_fields = ('user', 'created_at', 'updated_at', 'status', 'category', 
                            'severity', 'response_time')
+
+class CivicIssueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CivicIssue
+        fields = ['id', 'issue', 'description', 'name', 'phone', 'address', 'created_at']
+        read_only_fields = ('created_at',)

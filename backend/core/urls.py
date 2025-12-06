@@ -22,6 +22,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('accounts.urls')),
+    path("", include("accounts.urls")),   # replace yourapp with actual app name
+    path("api/", include("accounts.urls")),
+
+
 ]
 
 if settings.DEBUG:
