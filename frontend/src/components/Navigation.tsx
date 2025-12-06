@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
   Home,
   BarChart3,
   Trash2,
@@ -23,8 +29,126 @@ import {
   Sun,
   Leaf,
   Menu,
-  FileText
+  FileText,
+  Bell,
+  MapPin,
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
+
+// --- NEW SUB-COMPONENT: Notification Bell ---
+const NotificationBell = () => {
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
+
+  const fetchNotifications = () => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          // Assuming token is stored in localStorage, adjust based on your AuthContext
+          const token = localStorage.getItem('vasundhara_access_token'); 
+          
+          const response = await fetch(
+            `http://127.0.0.1:8000/api/notifications/nearby/?lat=${latitude}&lon=${longitude}&radius=5`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              }
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            setAlerts(data.alerts || []);
+          }
+        } catch (error) {
+          console.error("Failed to fetch notifications", error);
+        }
+      },
+      (error) => console.log("Location permission denied"),
+      { enableHighAccuracy: false, timeout: 5000 }
+    );
+  };
+
+  // Poll every 60 seconds
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000); 
+    return () => clearInterval(interval);
+  }, []);
+
+  const getSeverityColor = (severity) => {
+    switch (severity?.toLowerCase()) {
+      case 'high': return 'text-red-500 bg-red-100 dark:bg-red-900/30';
+      case 'medium': return 'text-orange-500 bg-orange-100 dark:bg-orange-900/30';
+      default: return 'text-blue-500 bg-blue-100 dark:bg-blue-900/30';
+    }
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon" className="relative rounded-full">
+          <Bell className="h-4 w-4" />
+          {alerts.length > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white animate-pulse">
+              {alerts.length}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <div className="p-4 border-b border-border">
+          <h4 className="font-semibold leading-none">{t('Nearby Alerts')}</h4>
+          <p className="text-sm text-muted-foreground mt-1">
+            {alerts.length} {t('issues within 5km')}
+          </p>
+        </div>
+        <ScrollArea className="h-[300px]">
+          {alerts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
+              <Leaf className="h-8 w-8 mb-2 opacity-50" />
+              <p className="text-sm">{t('No nearby issues found')}</p>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {alerts.map((alert) => (
+                <div key={alert.id} className="p-4 border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer">
+                  <div className="flex justify-between items-start mb-1">
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getSeverityColor(alert.severity)}`}>
+                      {alert.severity}
+                    </span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date(alert.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </span>
+                  </div>
+                  <h5 className="font-medium text-sm mb-1">{alert.issue_type}</h5>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                    {alert.description}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      <span>{alert.distance_km} km away</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  );
+};
+// ---------------------------------------------
+
 
 const Navigation = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -39,7 +163,7 @@ const Navigation = () => {
     navigate('/');
   };
 
-  const handleNavigation = (path: string) => {
+  const handleNavigation = (path) => {
     setMobileMenuOpen(false);
     navigate(path);
   };
@@ -80,6 +204,10 @@ const Navigation = () => {
                     </Button>
                   </Link>
                 ))}
+                
+                {/* INSERT NOTIFICATION BELL HERE */}
+                <NotificationBell />
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -115,6 +243,10 @@ const Navigation = () => {
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
+            
+            {/* Show Bell on Mobile too if logged in */}
+            {isAuthenticated && <NotificationBell />}
+
             <Button
               variant="outline"
               size="icon"

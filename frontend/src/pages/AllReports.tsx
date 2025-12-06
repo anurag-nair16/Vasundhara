@@ -19,7 +19,7 @@ const AllReports = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get('/auth/all-reports/');
+      const res = await apiClient.get('/auth/reports/');
       setReports(res.data.reports || []);
     } catch (e) {
       console.error('Failed to fetch reports', e);

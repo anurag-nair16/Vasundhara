@@ -422,3 +422,83 @@ def receive_issue(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.utils import timezone
+from datetime import timedelta
+# Make sure to import the models and utils
+from .models import WasteReport
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .utils import calculate_distance
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_nearby_alerts(request):
+    """
+    Frontend sends current lat/lon.
+    Backend returns valid issues within 'radius' km submitted in the last 24 hours.
+    Excludes the current user's own reports.
+    """
+    try:
+        # 1. Get User's Current Dynamic Location
+        user_lat = request.query_params.get('lat')
+        user_lon = request.query_params.get('lon')
+        radius_km = float(request.query_params.get('radius', 5.0)) 
+
+        if not user_lat or not user_lon:
+            return Response({"error": "Latitude and Longitude required"}, status=400)
+
+        user_lat = float(user_lat)
+        user_lon = float(user_lon)
+
+        # 2. Get recent reports (last 24 hours)
+        time_threshold = timezone.now() - timedelta(hours=24)
+        
+        # Filter: 
+        # - Created recently
+        # - Has valid coordinates
+        # - NOT invalid status
+        # - NOT created by the current user (exclude self) <--- NEW CHANGE
+        recent_reports = WasteReport.objects.filter(
+            created_at__gte=time_threshold,
+            latitude__isnull=False,
+            longitude__isnull=False
+        ).exclude(status='invalid').exclude(user=request.user) 
+
+        nearby_alerts = []
+
+        # 3. Calculate distance
+        for report in recent_reports:
+            try:
+                distance = calculate_distance(
+                    user_lat, user_lon, 
+                    report.latitude, report.longitude
+                )
+
+                if distance <= radius_km:
+                    nearby_alerts.append({
+                        "id": report.id,
+                        "type": "Waste Report",
+                        "issue_type": report.issue_type,
+                        "description": report.description,
+                        "severity": report.severity,
+                        "distance_km": round(distance, 2),
+                        "latitude": report.latitude,
+                        "longitude": report.longitude,
+                        "created_at": report.created_at,
+                        "image_url": report.photo.url if report.photo else None
+                    })
+            except Exception:
+                continue 
+
+        return Response({
+            "count": len(nearby_alerts),
+            "alerts": nearby_alerts,
+        })
+
+    except ValueError:
+        return Response({"error": "Invalid coordinates format"}, status=400)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

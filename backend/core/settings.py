@@ -144,6 +144,29 @@ MEDIA_ROOT = BASE_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REDIS_HOST = 'localhost' 
+REDIS_PORT = 6379 
+
+# --- 2. CACHES Configuration ---
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/0", # DB 0 for Django caching
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    # Dedicated cache/DB for the geospatial data
+    "GEODATA": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # Use a separate Redis DB (DB 1) for your transient Geo data storage
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1", 
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
