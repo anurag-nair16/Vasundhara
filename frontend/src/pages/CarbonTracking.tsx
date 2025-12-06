@@ -84,7 +84,7 @@ const CarbonTracking = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Carbon Footprint Tracking
           </h1>
           <p className="text-muted-foreground">
@@ -101,12 +101,12 @@ const CarbonTracking = () => {
           >
             <Card className="p-6 gradient-card border-border/50 shadow-soft">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-foreground">Current Emissions</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground">Current Emissions</h3>
                 <TrendingDown className="h-6 w-6 text-success" />
               </div>
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-5xl font-bold text-foreground">{currentEmissions}</span>
-                <span className="text-2xl text-muted-foreground">kg CO₂</span>
+                <span className="text-4xl sm:text-5xl font-bold text-foreground">{currentEmissions}</span>
+                <span className="text-xl sm:text-2xl text-muted-foreground">kg CO₂</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">This month</p>
               <div className="flex items-center gap-2 text-sm text-success">
@@ -123,7 +123,7 @@ const CarbonTracking = () => {
           >
             <Card className="p-6 gradient-card border-border/50 shadow-soft">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-foreground">Target Progress</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground">Target Progress</h3>
                 <Zap className="h-6 w-6 text-primary" />
               </div>
               <div className="mb-4">
@@ -148,7 +148,7 @@ const CarbonTracking = () => {
             transition={{ delay: 0.3 }}
           >
             <Card className="p-6 gradient-card border-border/50 shadow-soft">
-              <h3 className="text-xl font-semibold text-foreground mb-4">Monthly Trend</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Monthly Trend</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
@@ -173,7 +173,7 @@ const CarbonTracking = () => {
             transition={{ delay: 0.4 }}
           >
             <Card className="p-6 gradient-card border-border/50 shadow-soft">
-              <h3 className="text-xl font-semibold text-foreground mb-4">Emission Breakdown</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Emission Breakdown</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -211,9 +211,9 @@ const CarbonTracking = () => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Lightbulb className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-semibold text-foreground">AI-Powered Recommendations</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground">AI-Powered Recommendations</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {recommendations.map((rec, index) => (
               <Card key={index} className="p-5 gradient-card border-border/50 hover:shadow-eco transition-all duration-300">
                 <div className={`${rec.color} mb-3`}>
@@ -241,7 +241,7 @@ const CarbonTracking = () => {
           className="mt-8"
         >
           <Card className="p-6 gradient-card border-primary/20 shadow-eco">
-            <h3 className="text-xl font-semibold text-foreground mb-4">Understanding Your Footprint</h3>
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Understanding Your Footprint</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-primary mt-0.5" />

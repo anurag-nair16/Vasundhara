@@ -104,12 +104,12 @@ const Auth = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="p-8 gradient-card border-border/50 shadow-eco">
+        <Card className="p-4 sm:p-6 md:p-8 gradient-card border-border/50 shadow-eco">
           <div className="flex flex-col items-center mb-6">
             <div className="bg-gradient-eco p-4 rounded-2xl mb-4 shadow-eco animate-float">
               <Leaf className="h-12 w-12 text-primary-foreground" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Vasundhara 2.0</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Vasundhara 2.0</h1>
             <p className="text-muted-foreground">Agentic Civic OS</p>
           </div>
 

@@ -198,7 +198,7 @@ const WasteManagement = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Waste & Resource Management
           </h1>
           <p className="text-muted-foreground">
@@ -254,10 +254,10 @@ const WasteManagement = () => {
                 onChange={(e) => setIssueText(e.target.value)}
               />
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <Button
                   variant={photoData ? 'default' : 'outline'}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto"
                   onClick={handleAddPhoto}
                 >
                   <Camera className="h-4 w-4" />
@@ -265,7 +265,7 @@ const WasteManagement = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto"
                   onClick={() => setIsRecording(!isRecording)}
                 >
                   <Mic className={`h-4 w-4 ${isRecording ? 'text-destructive animate-pulse' : ''}`} />
@@ -273,14 +273,14 @@ const WasteManagement = () => {
                 </Button>
                 <Button
                   variant={locationData ? 'default' : 'outline'}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto"
                   onClick={handleGetLocation}
                 >
                   <MapPin className="h-4 w-4" />
                   {locationData ? 'Location Added' : 'Add Location'}
                 </Button>
                 <Button
-                  className="gradient-eco shadow-eco gap-2 ml-auto"
+                  className="gradient-eco shadow-eco gap-2 w-full sm:w-auto sm:ml-auto"
                   onClick={handleSubmitIssue}
                   disabled={isLoading || !issueText.trim()}
                 >
@@ -309,8 +309,8 @@ const WasteManagement = () => {
           className="mb-8"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft overflow-hidden">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">Live Resource Map</h2>
-            <div className="bg-muted/30 rounded-lg h-[400px] flex items-center justify-center relative overflow-hidden">
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Live Resource Map</h2>
+            <div className="bg-muted/30 rounded-lg h-[250px] sm:h-[300px] md:h-[400px] flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5"></div>
               <div className="relative z-10 text-center">
                 <MapPin className="h-16 w-16 text-primary mx-auto mb-4 animate-bounce" />
@@ -332,7 +332,7 @@ const WasteManagement = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Your Recent Reports</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Your Recent Reports</h2>
           <div className="space-y-3">
             {recentReports.length > 0 ? (
               recentReports.map((report) => (
@@ -433,11 +433,11 @@ const WasteManagement = () => {
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Quantum-Optimized Routing</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Quantum-Optimized Routing</h3>
                 <p className="text-muted-foreground mb-3">
                   AI automatically optimizes waste collection routes, reducing response time by 40% and saving 50kg CO₂ per trip.
                 </p>
-                <div className="flex gap-4 text-sm">
+                <div className="flex flex-wrap gap-4 sm:gap-6 text-sm">
                   <div>
                     <span className="text-2xl font-bold text-success">40%</span>
                     <p className="text-muted-foreground">Faster Response</p>
@@ -456,7 +456,7 @@ const WasteManagement = () => {
           </Card>
         </motion.div>
       </div>
-    </div>
+    </div >
   );
 };
 

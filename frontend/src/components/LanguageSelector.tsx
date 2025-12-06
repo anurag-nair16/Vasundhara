@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Globe, Check, Loader2 } from 'lucide-react';
+import { Globe, Check, Loader2, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 const LanguageSelector = () => {
@@ -33,32 +33,36 @@ const LanguageSelector = () => {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="outline"
-                    size="icon"
-                    className="rounded-full relative"
+                    size="sm"
+                    className="h-9 gap-2 px-3 rounded-full border-border/60 bg-background/50 backdrop-blur-sm hover:bg-accent/50 transition-all duration-300"
                 >
                     {isTranslating ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                     ) : (
-                        <Globe className="h-4 w-4" />
+                        <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                     )}
-                    {language !== 'en' && (
-                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
-                    )}
+                    <span className="text-xs font-medium uppercase tracking-wide">
+                        {currentLang?.code || 'EN'}
+                    </span>
+                    <ChevronDown className="h-3 w-3 text-muted-foreground opacity-70" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-56 rounded-xl border-border/60 shadow-eco backdrop-blur-xl bg-background/95 p-2 animate-in fade-in-0 zoom-in-95">
                 {supportedLanguages.map((lang) => (
                     <DropdownMenuItem
                         key={lang.code}
                         onClick={() => handleLanguageChange(lang.code)}
-                        className="flex items-center justify-between cursor-pointer"
+                        className="flex items-center justify-between cursor-pointer rounded-lg px-3 py-2.5 hover:bg-muted text-sm"
                     >
-                        <div className="flex items-center gap-2">
-                            <span>{lang.flag}</span>
-                            <span>{lang.nativeName}</span>
+                        <div className="flex items-center gap-3">
+                            <span className="text-lg leading-none">{lang.flag}</span>
+                            <div className="flex flex-col gap-0.5">
+                                <span className="font-medium text-foreground">{lang.nativeName}</span>
+                                <span className="text-xs text-muted-foreground capitalize">{lang.name}</span>
+                            </div>
                         </div>
                         {language === lang.code && (
-                            <Check className="h-4 w-4 text-primary" />
+                            <Check className="h-3.5 w-3.5 text-primary" />
                         )}
                     </DropdownMenuItem>
                 ))}

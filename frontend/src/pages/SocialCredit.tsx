@@ -59,7 +59,7 @@ const SocialCredit = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Social Credit System
           </h1>
           <p className="text-muted-foreground">
@@ -76,30 +76,30 @@ const SocialCredit = () => {
         >
           <Card className="p-8 gradient-card border-border/50 shadow-eco">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-eco shadow-eco mb-4 relative">
+              <div className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-gradient-eco shadow-eco mb-4 relative">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200 }}
-                  className="text-4xl font-bold text-primary-foreground"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-foreground"
                 >
                   {unifiedScore}
                 </motion.div>
                 <Trophy className="absolute -top-2 -right-2 h-8 w-8 text-sun animate-pulse" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Unified Credit Score</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Unified Credit Score</h2>
               <p className="text-muted-foreground">Eco Score + Civic Score</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div className="text-center p-4 rounded-lg bg-primary/10">
                 <Leaf className="h-8 w-8 text-primary mx-auto mb-2" />
-                <p className="text-3xl font-bold text-foreground">{user.ecoScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">{user.ecoScore}</p>
                 <p className="text-sm text-muted-foreground">Eco Score</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-secondary/10">
                 <Users className="h-8 w-8 text-secondary mx-auto mb-2" />
-                <p className="text-3xl font-bold text-foreground">{user.civicScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-foreground">{user.civicScore}</p>
                 <p className="text-sm text-muted-foreground">Civic Score</p>
               </div>
             </div>
@@ -124,7 +124,7 @@ const SocialCredit = () => {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="h-6 w-6 text-primary" />
             Others benefitted in the community
           </h2>
@@ -157,7 +157,7 @@ const SocialCredit = () => {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
             <Trophy className="h-6 w-6 text-primary" />
             Community Leaderboard
           </h2>
@@ -171,9 +171,9 @@ const SocialCredit = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${entry.rank === 1 ? 'bg-sun text-sun-foreground' :
-                        entry.rank === 2 ? 'bg-muted text-foreground' :
-                          entry.rank === 3 ? 'bg-earth text-earth-foreground' :
-                            'bg-muted text-foreground'
+                      entry.rank === 2 ? 'bg-muted text-foreground' :
+                        entry.rank === 3 ? 'bg-earth text-earth-foreground' :
+                          'bg-muted text-foreground'
                       }`}>
                       {entry.rank}
                     </div>
@@ -198,7 +198,7 @@ const SocialCredit = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
             <Gift className="h-6 w-6 text-primary" />
             Available Rewards
           </h2>

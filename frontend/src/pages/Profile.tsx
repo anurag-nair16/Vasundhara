@@ -61,7 +61,7 @@ const Profile = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Profile Settings
           </h1>
           <p className="text-muted-foreground">
@@ -77,7 +77,7 @@ const Profile = () => {
           className="mb-6"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
-            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
               Personal Information
             </h2>
@@ -116,7 +116,7 @@ const Profile = () => {
           className="mb-6"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
-            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
               Preferences
             </h2>
@@ -179,15 +179,15 @@ const Profile = () => {
           className="mb-6"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Score History</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Score History</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-primary/10">
                 <p className="text-sm text-muted-foreground mb-1">Current Eco Score</p>
-                <p className="text-3xl font-bold text-primary">{user.ecoScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-primary">{user.ecoScore}</p>
               </div>
               <div className="p-4 rounded-lg bg-secondary/10">
                 <p className="text-sm text-muted-foreground mb-1">Current Civic Score</p>
-                <p className="text-3xl font-bold text-secondary">{user.civicScore}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-secondary">{user.civicScore}</p>
               </div>
             </div>
           </Card>
@@ -201,22 +201,22 @@ const Profile = () => {
           className="mb-6"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
-            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Award className="h-5 w-5 text-primary" />
               Achievements & Stats
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                 <p className="text-sm text-muted-foreground mb-1">Badge</p>
-                <p className="text-2xl font-bold text-green-600">{user.badge}</p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">{user.badge}</p>
               </div>
               <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-sm text-muted-foreground mb-1">Issues Reported</p>
-                <p className="text-2xl font-bold text-blue-600">{user.issuesReported}</p>
+                <p className="text-xl sm:text-2xl font-bold text-blue-600">{user.issuesReported}</p>
               </div>
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
                 <p className="text-sm text-muted-foreground mb-1">Carbon Credits</p>
-                <p className="text-2xl font-bold text-orange-600">{user.carbonCredits.toFixed(1)}</p>
+                <p className="text-xl sm:text-2xl font-bold text-orange-600">{user.carbonCredits.toFixed(1)}</p>
               </div>
             </div>
           </Card>

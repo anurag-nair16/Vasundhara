@@ -76,7 +76,7 @@ const Dashboard = () => {
         >
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
                 Welcome back, {user.name}! 👋
               </h1>
               <p className="text-muted-foreground">
@@ -128,7 +128,7 @@ const Dashboard = () => {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Quick Actions</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickActions.map((action, index) => (
               <Card
@@ -156,15 +156,15 @@ const Dashboard = () => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Bell className="h-5 w-5 text-primary" />
-            <h2 className="text-2xl font-semibold text-foreground">Recent Updates</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Recent Updates</h2>
           </div>
           <div className="space-y-3">
             {notifications.map((notification) => (
               <Card key={notification.id} className="p-4 gradient-card border-border/50">
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-full ${notification.type === 'success' ? 'bg-success/10 text-success' :
-                      notification.type === 'warning' ? 'bg-warning/10 text-warning' :
-                        'bg-info/10 text-info'
+                    notification.type === 'warning' ? 'bg-warning/10 text-warning' :
+                      'bg-info/10 text-info'
                     }`}>
                     <Bell className="h-4 w-4" />
                   </div>
@@ -186,18 +186,18 @@ const Dashboard = () => {
           className="mt-8"
         >
           <Card className="p-6 gradient-card border-primary/20 shadow-eco">
-            <h3 className="text-xl font-semibold text-foreground mb-4">Your Impact This Month</h3>
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Your Impact This Month</h3>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-green-600">{co2Reduced} kg</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-600">{co2Reduced} kg</p>
                 <p className="text-sm text-muted-foreground mt-1">CO₂ Reduced</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-blue-600">{stats.total_reports}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-blue-600">{stats.total_reports}</p>
                 <p className="text-sm text-muted-foreground mt-1">Issues Reported</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-orange-600">{stats.resolved}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-orange-600">{stats.resolved}</p>
                 <p className="text-sm text-muted-foreground mt-1">Issues Resolved</p>
               </div>
             </div>

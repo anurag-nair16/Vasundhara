@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
-import { 
-  Leaf, 
-  Recycle, 
-  Award, 
-  TrendingUp, 
-  Users, 
+import {
+  Leaf,
+  Recycle,
+  Award,
+  TrendingUp,
+  Users,
   Globe,
   Zap,
   Shield,
@@ -68,10 +68,10 @@ const Index = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
+      <section className="relative overflow-hidden py-12 sm:py-16 md:py-20 px-4">
         <div className="absolute inset-0 bg-gradient-hero opacity-10"></div>
         <div className="container mx-auto max-w-6xl relative z-10">
-          <motion.div 
+          <motion.div
             className="text-center space-y-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -87,33 +87,33 @@ const Index = () => {
               <span className="text-sm font-medium text-primary">Powered by Agentic AI</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold text-foreground">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-foreground">
               Sustainable Communities
               <span className="block mt-2 bg-gradient-eco bg-clip-text text-transparent">
                 Start Here
               </span>
             </h1>
 
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Vasundhara 2.0 brings AI-powered sustainability intelligence to every citizen. 
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Vasundhara 2.0 brings AI-powered sustainability intelligence to every citizen.
               Track carbon, manage waste, and earn rewards for building a greener future.
             </p>
 
-            <div className="flex items-center justify-center gap-4 pt-4">
-              <Link to="/auth">
-                <Button size="lg" className="gradient-eco shadow-eco gap-2 text-lg px-8">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
+              <Link to="/auth" className="w-full sm:w-auto">
+                <Button size="lg" className="gradient-eco shadow-eco gap-2 text-base sm:text-lg px-6 sm:px-8 w-full sm:w-auto">
                   Get Started
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="gap-2 text-lg">
+              <Button size="lg" variant="outline" className="gap-2 text-base sm:text-lg w-full sm:w-auto">
                 <Shield className="h-5 w-5" />
                 Learn More
               </Button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-8 sm:pt-12">
               {stats.map((stat, index) => (
                 <motion.div
                   key={index}
@@ -122,7 +122,7 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
                 >
-                  <p className="text-3xl md:text-4xl font-bold text-primary">{stat.value}</p>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{stat.value}</p>
                   <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
                 </motion.div>
               ))}
@@ -132,23 +132,23 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-12 sm:py-16 md:py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
-          <motion.div 
-            className="text-center mb-12"
+          <motion.div
+            className="text-center mb-8 sm:mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
               Complete Sustainability Platform
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Everything you need for sustainable civic living in one place
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -175,23 +175,23 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 md:py-20 px-4">
         <div className="container mx-auto max-w-4xl">
-          <Card className="p-12 text-center gradient-card border-primary/20 shadow-eco">
+          <Card className="p-6 sm:p-8 md:p-12 text-center gradient-card border-primary/20 shadow-eco">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
             >
-              <Leaf className="h-16 w-16 text-primary mx-auto mb-6 animate-float" />
-              <h2 className="text-4xl font-bold text-foreground mb-4">
+              <Leaf className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 text-primary mx-auto mb-4 sm:mb-6 animate-float" />
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Ready to Make a Difference?
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8">
                 Join thousands of citizens building sustainable communities with AI
               </p>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-success" />
                   <span className="text-foreground">Free to join</span>
@@ -207,7 +207,7 @@ const Index = () => {
               </div>
 
               <Link to="/auth">
-                <Button size="lg" className="gradient-eco shadow-eco gap-2 text-lg px-8">
+                <Button size="lg" className="gradient-eco shadow-eco gap-2 text-base sm:text-lg px-6 sm:px-8">
                   Join Vasundhara 2.0
                   <ArrowRight className="h-5 w-5" />
                 </Button>
@@ -218,10 +218,10 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-4">
+      <footer className="border-t border-border py-6 sm:py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 Vasundhara 2.0 - Agentic Civic OS for Sustainable Communities</p>
-          <p className="text-sm mt-2">Built with AI for a greener tomorrow</p>
+          <p className="text-sm sm:text-base">© 2025 Vasundhara 2.0 - Agentic Civic OS for Sustainable Communities</p>
+          <p className="text-xs sm:text-sm mt-2">Built with AI for a greener tomorrow</p>
         </div>
       </footer>
     </div>
