@@ -610,7 +610,7 @@ export default function RouteOptimization() {
 
                                         <div className="flex flex-col">
 
-                                            <Label htmlFor="avoid-mode" className="font-bold cursor-pointer text-gray-700">Avoid Hazards</Label>
+                                            <Label htmlFor="avoid-mode" className="font-bold cursor-pointer text-gray-700">Avoid Issues</Label>
 
                                             <span className="text-xs text-gray-500">{avoidIssues ? "Strict Area Avoidance" : "Standard Routing"}</span>
 
