@@ -15,6 +15,7 @@ import WasteManagement from "./pages/WasteManagement";
 import AllReports from "./pages/AllReports";
 import SocialCredit from "./pages/SocialCredit";
 import Profile from "./pages/Profile";
+import RouteOptimization from "./pages/RouteOptimization";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/waste" element={<ProtectedRoute><WasteManagement /></ProtectedRoute>} />
                 <Route path="/reports" element={<ProtectedRoute><AllReports /></ProtectedRoute>} />
                 <Route path="/credits" element={<ProtectedRoute><SocialCredit /></ProtectedRoute>} />
+                <Route path="/route" element={<ProtectedRoute><RouteOptimization /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

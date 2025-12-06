@@ -48,6 +48,7 @@ const Navigation = () => {
     { path: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('Dashboard') },
     { path: '/carbon', icon: <BarChart3 className="h-4 w-4" />, label: t('Carbon') },
     { path: '/waste', icon: <Trash2 className="h-4 w-4" />, label: t('Waste') },
+    { path: '/route', icon: <Leaf className="h-4 w-4" />, label: t('Routes') },
     { path: '/reports', icon: <FileText className="h-4 w-4" />, label: t('Reports') },
     { path: '/credits', icon: <Award className="h-4 w-4" />, label: t('Credits') },
     { path: '/profile', icon: <User className="h-4 w-4" />, label: t('Profile') },
