@@ -9,10 +9,9 @@ import {
   TrendingDown,
   Lightbulb,
   Car,
-  Home,
-  ShoppingBag,
+  Info,
   Zap,
-  Info
+  Upload, Camera, CheckCircle2, Leaf, Bus, Sun, X, Recycle, CloudRain, Trash2, Image as ImageIcon
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -28,6 +27,18 @@ import {
   Cell,
   Legend
 } from 'recharts';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
 
 const CarbonTracking = () => {
   const monthlyData = [
@@ -46,29 +57,142 @@ const CarbonTracking = () => {
     { name: 'Shopping', value: 10, color: '#ef4444' }
   ];
 
-  const recommendations = [
+  const earningOptions = [
     {
-      icon: <Car className="h-5 w-5" />,
+      id: 'solar',
+      title: 'Install Solar Panels',
+      description: 'Generate clean energy and reduce reliance on the grid.',
+      reward: '500 Credits',
+      icon: <Sun className="h-6 w-6 text-orange-500" />,
+      color: 'bg-orange-500/10 text-orange-500',
+      requirements: ['Photo of installation', 'Utility bill or Receipt with your name']
+    },
+    {
+      id: 'transport',
       title: 'Use Public Transport',
-      description: 'Switch to metro/bus 3 days a week',
-      impact: '-15 kg CO₂/month',
-      color: 'text-blue-500'
+      description: 'Take the bus or metro to reduce daily emissions.',
+      reward: '50 Credits/week',
+      icon: <Bus className="h-6 w-6 text-blue-500" />,
+      color: 'bg-blue-500/10 text-blue-500',
+      requirements: ['Photo of ticket/pass', 'Selfie inside the vehicle']
     },
     {
-      icon: <Home className="h-5 w-5" />,
-      title: 'Solar Energy',
-      description: 'Install rooftop solar panels',
-      impact: '-80 kg CO₂/month',
-      color: 'text-amber-500'
+      id: 'plant',
+      title: 'Plant a Tree',
+      description: 'Increase green cover and absorb CO₂.',
+      reward: '100 Credits',
+      icon: <Leaf className="h-6 w-6 text-green-500" />,
+      color: 'bg-green-500/10 text-green-500',
+      requirements: ['Photo of planted sapling', 'GPS Location screenshot']
     },
     {
-      icon: <ShoppingBag className="h-5 w-5" />,
-      title: 'Local Products',
-      description: 'Buy locally sourced goods',
-      impact: '-10 kg CO₂/month',
-      color: 'text-green-500'
+      id: 'compost',
+      title: 'Home Composting',
+      description: 'Recycle organic waste into nutrient-rich soil.',
+      reward: '200 Credits',
+      icon: <Recycle className="h-6 w-6 text-earth" />,
+      color: 'bg-earth/10 text-earth',
+      requirements: ['Photo of compost bin', 'Usage log']
+    },
+    {
+      id: 'water',
+      title: 'Rainwater Harvesting',
+      description: 'Collect and store rainwater for reuse.',
+      reward: '300 Credits',
+      icon: <CloudRain className="h-6 w-6 text-water" />,
+      color: 'bg-water/10 text-water',
+      requirements: ['Photo of harvesting system', 'Installation receipt']
+    },
+    {
+      id: 'energy',
+      title: 'Energy Efficiency',
+      description: 'Use 5-star rated appliances to save power.',
+      reward: '150 Credits',
+      icon: <Zap className="h-6 w-6 text-yellow-500" />,
+      color: 'bg-yellow-500/10 text-yellow-500',
+      requirements: ['Photo of appliance rating label', 'Purchase receipt']
     }
   ];
+
+  const [selectedOption, setSelectedOption] = useState<typeof earningOptions[0] | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+
+  useEffect(() => {
+    // Cleanup preview URLs on unmount or change
+    return () => {
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(Array.from(e.dataTransfer.files));
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleFiles = (files: File[]) => {
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (validFiles.length !== files.length) {
+      toast.error("Some files were skipped (only images allowed)");
+    }
+
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+      const newUrls = validFiles.map(file => URL.createObjectURL(file));
+      setPreviewUrls(prev => [...prev, ...newUrls]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    if (previewUrls[index]) URL.revokeObjectURL(previewUrls[index]);
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const clearFiles = () => {
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+  };
+
+  const handleSubmitProof = () => {
+    if (selectedFiles.length === 0) {
+      toast.error("Please upload at least one proof image");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSelectedOption(null);
+      clearFiles(); // Reset file state
+      toast.success("Proofs submitted successfully! Credits will be verified shortly.");
+    }, 1500);
+  };
 
   const currentEmissions = 270;
   const targetEmissions = 200;
@@ -90,6 +214,157 @@ const CarbonTracking = () => {
           <p className="text-muted-foreground">
             Track, understand, and reduce your environmental impact with AI-powered insights
           </p>
+        </motion.div>
+
+        {/* Earn Carbon Credits Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Leaf className="h-6 w-6 text-primary" />
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Ways to Earn Carbon Credits</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {earningOptions.map((option) => (
+              <Card key={option.id} className="p-5 gradient-card border-border/50 hover:shadow-eco transition-all duration-300 flex flex-col h-full">
+                <div className={`p-3 w-fit rounded-lg ${option.color} mb-4`}>
+                  {option.icon}
+                </div>
+                <h4 className="font-semibold text-lg text-foreground mb-2">{option.title}</h4>
+                <p className="text-sm text-muted-foreground mb-4 flex-grow">{option.description}</p>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-sm font-bold text-success bg-success/10 px-2 py-1 rounded-full">
+                    +{option.reward}
+                  </span>
+                  <Button
+                    size="sm"
+                    className="gap-1 shadow-sm"
+                    onClick={() => setSelectedOption(option)}
+                  >
+                    <Upload className="h-3 w-3" />
+                    Submit Proof
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <Dialog open={!!selectedOption} onOpenChange={(open) => {
+            if (!open) {
+              setSelectedOption(null);
+              clearFiles();
+            }
+          }}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Submit Proof for {selectedOption?.title}</DialogTitle>
+                <DialogDescription>
+                  Upload the required documents to claim your {selectedOption?.reward}.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="p-3 bg-muted/50 rounded-lg text-sm">
+                  <p className="font-medium mb-2">Requirements:</p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    {selectedOption?.requirements.map((req, i) => (
+                      <li key={i}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="grid w-full gap-2">
+                  <Label htmlFor="picture">Upload Proof</Label>
+
+                  {/* Image Previews Grid */}
+                  {previewUrls.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3 mb-2">
+                      {previewUrls.map((url, index) => (
+                        <div key={index} className="relative w-full h-32 rounded-lg overflow-hidden border border-border group animate-in fade-in-0 zoom-in-95 duration-300">
+                          <img
+                            src={url}
+                            alt={`Preview ${index}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              onClick={() => removeFile(index)}
+                              className="h-8 w-8 rounded-full shadow-md"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Dropzone (Stick around to allow adding more) */}
+                  <div className="flex items-center justify-center w-full">
+                    <label
+                      htmlFor="dropzone-file"
+                      className={`flex flex-col items-center justify-center w-full ${previewUrls.length > 0 ? 'h-24' : 'h-40'} border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 ${dragActive
+                          ? 'border-primary bg-primary/5 scale-[1.02]'
+                          : 'border-input hover:bg-muted/50 hover:border-primary/50'
+                        }`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                        <div className={`p-2 rounded-full mb-2 transition-colors ${dragActive ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                          {dragActive ? <Upload className="h-5 w-5 animate-bounce" /> : <ImageIcon className="h-5 w-5" />}
+                        </div>
+                        <p className="text-xs sm:text-sm text-foreground mb-1">
+                          <span className="font-semibold text-primary">{previewUrls.length > 0 ? 'Add more images' : 'Click to upload proof'}</span> or drag and drop
+                        </p>
+                        {previewUrls.length === 0 && (
+                          <p className="text-[10px] text-muted-foreground">
+                            JPEG, PNG or WEBP (MAX. 5MB)
+                          </p>
+                        )}
+                      </div>
+                      <Input
+                        id="dropzone-file"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter className="sm:justify-between gap-2">
+                <Button variant="outline" onClick={() => setSelectedOption(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmitProof}
+                  disabled={isSubmitting}
+                  className="gradient-eco"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent mr-2" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Submit for Verification
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </motion.div>
 
         {/* Current Status */}
@@ -203,35 +478,7 @@ const CarbonTracking = () => {
           </motion.div>
         </div>
 
-        {/* AI Recommendations */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="h-6 w-6 text-primary" />
-            <h2 className="text-xl sm:text-2xl font-semibold text-foreground">AI-Powered Recommendations</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {recommendations.map((rec, index) => (
-              <Card key={index} className="p-5 gradient-card border-border/50 hover:shadow-eco transition-all duration-300">
-                <div className={`${rec.color} mb-3`}>
-                  {rec.icon}
-                </div>
-                <h4 className="font-semibold text-foreground mb-2">{rec.title}</h4>
-                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-success font-medium">{rec.impact}</span>
-                  <Button size="sm" variant="outline" className="gap-1">
-                    <Info className="h-3 w-3" />
-                    Details
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </motion.div>
+
 
         {/* Explainability Section */}
         <motion.div
