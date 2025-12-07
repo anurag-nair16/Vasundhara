@@ -47,7 +47,7 @@ const LanguageSelector = () => {
                     <ChevronDown className="h-3 w-3 text-muted-foreground opacity-70" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-xl border-border/60 shadow-eco backdrop-blur-xl bg-background/95 p-2 animate-in fade-in-0 zoom-in-95">
+            <DropdownMenuContent align="end" className="w-56 rounded-xl border-border/60 shadow-eco backdrop-blur-xl bg-background/95 p-2 animate-in fade-in-0 zoom-in-95" data-no-translate>
                 {supportedLanguages.map((lang) => (
                     <DropdownMenuItem
                         key={lang.code}

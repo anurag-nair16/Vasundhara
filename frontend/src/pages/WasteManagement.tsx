@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
 import apiClient from '@/lib/api';
 import { Card } from '@/components/ui/card';
@@ -26,6 +27,7 @@ import { toast } from 'sonner';
 
 const WasteManagement = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [issueText, setIssueText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -243,7 +245,7 @@ const WasteManagement = () => {
           <Card className="p-6 gradient-card border-border/50 shadow-eco">
             <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Trash2 className="h-6 w-6 text-primary" />
-              Report an Issue
+              {t('Report an Issue')}
             </h2>
 
             <div className="space-y-4">
@@ -397,10 +399,11 @@ const WasteManagement = () => {
                               'outline'
                       }
                       className={
-                        report.status === 'resolved' ? 'bg-success text-success-foreground' :
+                        report.status === 'resolved' ? 'bg-green-500 text-white' :
                           report.status === 'in-progress' ? 'bg-warning text-warning-foreground' :
                             report.status === 'invalid' ? 'bg-red-500 text-white' :
-                              ''
+                              report.status === 'pending' ? 'bg-gray-800 text-white dark:bg-gray-700' :
+                                ''
                       }
                     >
                       {report.status === 'resolved' ? <CheckCircle className="h-3 w-3 mr-1" /> :

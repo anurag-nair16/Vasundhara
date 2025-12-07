@@ -215,7 +215,7 @@ function getTextNodes(element: Element): { node: Element; text: string }[] {
 
     translatableSelectors.forEach(selector => {
         element.querySelectorAll(selector).forEach(el => {
-            if (el.closest('script, style, input, textarea, select, [data-radix-collection-item]')) return;
+            if (el.closest('script, style, input, textarea, select, [data-radix-collection-item], [data-no-translate]')) return;
             if (el.hasAttribute(ORIGINAL_TEXT_ATTR)) return;
             if (el.children.length > 0) return;
 

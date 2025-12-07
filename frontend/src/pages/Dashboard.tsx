@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Navigation from '@/components/Navigation';
 import ScoreCard from '@/components/ScoreCard';
 import apiClient from '@/lib/api';
@@ -20,6 +21,7 @@ import { motion } from 'framer-motion';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total_reports: 0,
@@ -54,10 +56,10 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { label: 'Report Issue', icon: <AlertCircle className="h-5 w-5" />, path: '/waste' },
-    { label: 'View Carbon Stats', icon: <TrendingUp className="h-5 w-5" />, path: '/carbon' },
-    { label: 'Check Leaderboard', icon: <Users className="h-5 w-5" />, path: '/credits' },
-    { label: 'Redeem Rewards', icon: <Award className="h-5 w-5" />, path: '/credits' }
+    { label: t('Report Issue'), icon: <AlertCircle className="h-5 w-5" />, path: '/waste' },
+    { label: t('View Carbon Stats'), icon: <TrendingUp className="h-5 w-5" />, path: '/carbon' },
+    { label: t('Check Leaderboard'), icon: <Users className="h-5 w-5" />, path: '/credits' },
+    { label: t('Redeem Rewards'), icon: <Award className="h-5 w-5" />, path: '/credits' }
   ];
 
   const unifiedScore = user.ecoScore + user.civicScore;
@@ -85,7 +87,7 @@ const Dashboard = () => {
             </div>
             <Button className="gradient-eco shadow-eco gap-2" onClick={() => navigate('/waste')}>
               <MapPin className="h-4 w-4" />
-              Report Issue
+              {t('Report Issue')}
             </Button>
           </div>
         </motion.div>

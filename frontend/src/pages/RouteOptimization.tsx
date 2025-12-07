@@ -440,13 +440,13 @@ function RoutingMap({
 
     return (
 
-        <div className="w-full h-full relative group">
+        <div className="w-full h-full relative group z-0">
 
-            <div ref={mapContainer} className="w-full h-full rounded-lg border border-gray-300 shadow-lg" style={{ minHeight: '600px' }} />
+            <div ref={mapContainer} className="w-full h-full rounded-lg border border-gray-300 shadow-lg relative z-0" style={{ minHeight: '600px' }} />
 
 
 
-            <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm p-3 rounded-md shadow-md z-[1000] text-xs space-y-2 border border-gray-200">
+            <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm p-3 rounded-md shadow-md z-10 text-xs space-y-2 border border-gray-200">
 
                 {isLoading && <div className="flex items-center gap-2 text-blue-600 font-bold border-b pb-2 mb-2"><Loader2 className="w-3 h-3 animate-spin" /> Calculating...</div>}
 
@@ -582,149 +582,149 @@ export default function RouteOptimization() {
 
                 <div className="max-w-7xl mx-auto">
 
-                <div className="mb-8">
+                    <div className="mb-8">
 
-                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Smart Route Optimizer</h1>
+                        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Smart Route Optimizer</h1>
 
-                    <p className="text-gray-500 mt-2"></p>
+                        <p className="text-gray-500 mt-2"></p>
 
-                </div>
-
-
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                    <div className="lg:col-span-4 space-y-4">
-
-                        <Card className="shadow-sm border-slate-200">
-
-                            <CardHeader className="pb-3"><CardTitle className="text-lg">Configuration</CardTitle></CardHeader>
-
-                            <CardContent className="space-y-6">
-
-                                <div className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${avoidIssues ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-
-                                    <div className="flex items-center gap-3">
-
-                                        {avoidIssues ? <ShieldCheck className="text-green-600 w-6 h-6" /> : <AlertTriangle className="text-gray-400 w-6 h-6" />}
-
-                                        <div className="flex flex-col">
-
-                                            <Label htmlFor="avoid-mode" className="font-bold cursor-pointer text-gray-700">Avoid Issues</Label>
-
-                                            <span className="text-xs text-gray-500">{avoidIssues ? "Strict Area Avoidance" : "Standard Routing"}</span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <Switch id="avoid-mode" checked={avoidIssues} onCheckedChange={setAvoidIssues} />
-
-                                </div>
+                    </div>
 
 
 
-                                <Tabs defaultValue="quick" className="w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                                    <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="quick">Presets</TabsTrigger><TabsTrigger value="custom">Manual</TabsTrigger></TabsList>
-
-                                    <TabsContent value="quick" className="space-y-4 pt-4">
-
-                                        <div>
-
-                                            <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Start Point</Label>
-
-                                            <div className="grid grid-cols-1 gap-2">
-
-                                                {PREDEFINED_LOCATIONS.sources.map((loc, idx) => (
-
-                                                    <Button key={idx} variant={source.name === loc.name ? 'default' : 'outline'} size="sm" className={`justify-start ${source.name === loc.name ? 'bg-blue-600 hover:bg-blue-700' : ''}`} onClick={() => handleSourceChange(loc)}>
-
-                                                        <MapPin className="w-3 h-3 mr-2" /> {loc.name}
-
-                                                    </Button>
-
-                                                ))}
-
-                                            </div>
-
-                                        </div>
-
-                                        <div>
-
-                                            <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">End Point</Label>
-
-                                            <div className="grid grid-cols-1 gap-2 max-h-[200px] overflow-y-auto pr-1">
-
-                                                {PREDEFINED_LOCATIONS.destinations.map((loc, idx) => (
-
-                                                    <Button key={idx} variant={destination.name === loc.name ? 'default' : 'outline'} size="sm" className={`justify-start ${destination.name === loc.name ? 'bg-red-600 hover:bg-red-700' : ''}`} onClick={() => handleDestinationChange(loc)}>
-
-                                                        <MapPin className="w-3 h-3 mr-2" /> {loc.name}
-
-                                                    </Button>
-
-                                                ))}
-
-                                            </div>
-
-                                        </div>
-
-                                    </TabsContent>
-
-                                    <TabsContent value="custom">
-
-                                        <div className="space-y-3 pt-2">
-
-                                            <div className="space-y-1"><Label>Source (Lat, Lng)</Label><Input value={sourceInput} onChange={e => setSourceInput(e.target.value)} placeholder="19.0760, 72.8777" /><Button onClick={handleCustomSource} size="sm" variant="secondary" className="w-full">Set Source</Button></div>
-
-                                            <div className="space-y-1"><Label>Destination (Lat, Lng)</Label><Input value={destInput} onChange={e => setDestInput(e.target.value)} placeholder="19.2183, 72.8615" /><Button onClick={handleCustomDestination} size="sm" variant="secondary" className="w-full">Set Destination</Button></div>
-
-                                        </div>
-
-                                    </TabsContent>
-
-                                </Tabs>
-
-                            </CardContent>
-
-                        </Card>
-
-
-
-                        {routeStats && (
+                        <div className="lg:col-span-4 space-y-4">
 
                             <Card className="shadow-sm border-slate-200">
 
-                                <CardHeader className="pb-2"><CardTitle className="text-base">Trip Summary</CardTitle></CardHeader>
+                                <CardHeader className="pb-3"><CardTitle className="text-lg">Configuration</CardTitle></CardHeader>
 
-                                <CardContent className="space-y-3">
+                                <CardContent className="space-y-6">
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${avoidIssues ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
 
-                                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-100"><div className="text-xs text-blue-600 font-medium uppercase">Distance</div><div className="text-xl font-bold text-blue-900">{routeStats.distance.toFixed(1)} km</div></div>
+                                        <div className="flex items-center gap-3">
 
-                                        <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100"><div className="text-xs text-indigo-600 font-medium uppercase">Duration</div><div className="text-xl font-bold text-indigo-900">{formatDuration(routeStats.duration)}</div></div>
+                                            {avoidIssues ? <ShieldCheck className="text-green-600 w-6 h-6" /> : <AlertTriangle className="text-gray-400 w-6 h-6" />}
+
+                                            <div className="flex flex-col">
+
+                                                <Label htmlFor="avoid-mode" className="font-bold cursor-pointer text-gray-700">Avoid Issues</Label>
+
+                                                <span className="text-xs text-gray-500">{avoidIssues ? "Strict Area Avoidance" : "Standard Routing"}</span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <Switch id="avoid-mode" checked={avoidIssues} onCheckedChange={setAvoidIssues} />
 
                                     </div>
+
+
+
+                                    <Tabs defaultValue="quick" className="w-full">
+
+                                        <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="quick">Presets</TabsTrigger><TabsTrigger value="custom">Manual</TabsTrigger></TabsList>
+
+                                        <TabsContent value="quick" className="space-y-4 pt-4">
+
+                                            <div>
+
+                                                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Start Point</Label>
+
+                                                <div className="grid grid-cols-1 gap-2">
+
+                                                    {PREDEFINED_LOCATIONS.sources.map((loc, idx) => (
+
+                                                        <Button key={idx} variant={source.name === loc.name ? 'default' : 'outline'} size="sm" className={`justify-start ${source.name === loc.name ? 'bg-blue-600 hover:bg-blue-700' : ''}`} onClick={() => handleSourceChange(loc)}>
+
+                                                            <MapPin className="w-3 h-3 mr-2" /> {loc.name}
+
+                                                        </Button>
+
+                                                    ))}
+
+                                                </div>
+
+                                            </div>
+
+                                            <div>
+
+                                                <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">End Point</Label>
+
+                                                <div className="grid grid-cols-1 gap-2 max-h-[200px] overflow-y-auto pr-1">
+
+                                                    {PREDEFINED_LOCATIONS.destinations.map((loc, idx) => (
+
+                                                        <Button key={idx} variant={destination.name === loc.name ? 'default' : 'outline'} size="sm" className={`justify-start ${destination.name === loc.name ? 'bg-red-600 hover:bg-red-700' : ''}`} onClick={() => handleDestinationChange(loc)}>
+
+                                                            <MapPin className="w-3 h-3 mr-2" /> {loc.name}
+
+                                                        </Button>
+
+                                                    ))}
+
+                                                </div>
+
+                                            </div>
+
+                                        </TabsContent>
+
+                                        <TabsContent value="custom">
+
+                                            <div className="space-y-3 pt-2">
+
+                                                <div className="space-y-1"><Label>Source (Lat, Lng)</Label><Input value={sourceInput} onChange={e => setSourceInput(e.target.value)} placeholder="19.0760, 72.8777" /><Button onClick={handleCustomSource} size="sm" variant="secondary" className="w-full">Set Source</Button></div>
+
+                                                <div className="space-y-1"><Label>Destination (Lat, Lng)</Label><Input value={destInput} onChange={e => setDestInput(e.target.value)} placeholder="19.2183, 72.8615" /><Button onClick={handleCustomDestination} size="sm" variant="secondary" className="w-full">Set Destination</Button></div>
+
+                                            </div>
+
+                                        </TabsContent>
+
+                                    </Tabs>
 
                                 </CardContent>
 
                             </Card>
 
-                        )}
 
-                    </div>
 
-                    <div className="lg:col-span-8 h-[600px] lg:h-auto">
+                            {routeStats && (
 
-                        <RoutingMap source={source} destination={destination} issues={MOCK_ISSUES} avoidIssues={avoidIssues} onRouteCalculated={setRouteStats} />
+                                <Card className="shadow-sm border-slate-200">
+
+                                    <CardHeader className="pb-2"><CardTitle className="text-base">Trip Summary</CardTitle></CardHeader>
+
+                                    <CardContent className="space-y-3">
+
+                                        <div className="grid grid-cols-2 gap-4">
+
+                                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100"><div className="text-xs text-blue-600 font-medium uppercase">Distance</div><div className="text-xl font-bold text-blue-900">{routeStats.distance.toFixed(1)} km</div></div>
+
+                                            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100"><div className="text-xs text-indigo-600 font-medium uppercase">Duration</div><div className="text-xl font-bold text-indigo-900">{formatDuration(routeStats.duration)}</div></div>
+
+                                        </div>
+
+                                    </CardContent>
+
+                                </Card>
+
+                            )}
+
+                        </div>
+
+                        <div className="lg:col-span-8 h-[600px] lg:h-auto">
+
+                            <RoutingMap source={source} destination={destination} issues={MOCK_ISSUES} avoidIssues={avoidIssues} onRouteCalculated={setRouteStats} />
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
 
             </div>
 

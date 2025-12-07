@@ -33,7 +33,7 @@ import { toast } from 'sonner';
 const Profile = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { language, setLanguage, supportedLanguages } = useLanguage();
+  const { t, language, setLanguage, supportedLanguages } = useLanguage();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,7 +79,7 @@ const Profile = () => {
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
-              Personal Information
+              {t('Personal Information')}
             </h2>
             <div className="space-y-4">
               <div>
@@ -118,7 +118,7 @@ const Profile = () => {
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              Preferences
+              {t('Preferences')}
             </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ const Profile = () => {
           className="mb-6"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
-            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Score History</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">{t('Score History')}</h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-primary/10">
                 <p className="text-sm text-muted-foreground mb-1">Current Eco Score</p>
@@ -203,7 +203,7 @@ const Profile = () => {
           <Card className="p-6 gradient-card border-border/50 shadow-soft">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <Award className="h-5 w-5 text-primary" />
-              Achievements & Stats
+              {t('Achievements & Stats')}
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">

@@ -50,8 +50,8 @@ const NotificationBell = () => {
         const { latitude, longitude } = position.coords;
         try {
           // Assuming token is stored in localStorage, adjust based on your AuthContext
-          const token = localStorage.getItem('vasundhara_access_token'); 
-          
+          const token = localStorage.getItem('vasundhara_access_token');
+
           const response = await fetch(
             `http://127.0.0.1:8000/api/notifications/nearby/?lat=${latitude}&lon=${longitude}&radius=5`,
             {
@@ -78,7 +78,7 @@ const NotificationBell = () => {
   // Poll every 60 seconds
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); 
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -125,7 +125,7 @@ const NotificationBell = () => {
                     </span>
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {new Date(alert.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <h5 className="font-medium text-sm mb-1">{alert.issue_type}</h5>
@@ -153,7 +153,7 @@ const NotificationBell = () => {
 const Navigation = () => {
   const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -171,7 +171,7 @@ const Navigation = () => {
   const navLinks = [
     { path: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('Dashboard') },
     { path: '/carbon', icon: <BarChart3 className="h-4 w-4" />, label: t('Carbon') },
-    { path: '/waste', icon: <Trash2 className="h-4 w-4" />, label: t('Waste') },
+    { path: '/waste', icon: <Trash2 className="h-4 w-4" />, label: t('Issue') },
     { path: '/route', icon: <Leaf className="h-4 w-4" />, label: t('Routes') },
     { path: '/reports', icon: <FileText className="h-4 w-4" />, label: t('Reports') },
     { path: '/credits', icon: <Award className="h-4 w-4" />, label: t('Credits') },
@@ -181,30 +181,30 @@ const Navigation = () => {
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border shadow-soft">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
+        <div className="flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
             <div className="bg-gradient-eco p-2 rounded-lg shadow-eco group-hover:scale-110 transition-transform">
               <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-foreground">Vasundhara 2.0</h1>
-              <p className="text-xs text-muted-foreground">{t('Agentic Civic Platform')}</p>
+            <div>
+              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-foreground whitespace-nowrap">Vasundhara 2.0</h1>
+              <p className="text-xs text-muted-foreground hidden md:block truncate max-w-[150px]">{t('Agentic Civic Platform')}</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 flex-shrink-0">
             {isAuthenticated && (
               <>
                 {navLinks.map((link) => (
-                  <Link key={link.path} to={link.path}>
-                    <Button variant="ghost" size="sm" className="gap-2">
+                  <Link key={`${link.path}-${language}`} to={link.path}>
+                    <Button variant="ghost" size="sm" className="gap-1 px-2 xl:px-3" title={link.label}>
                       {link.icon}
-                      {link.label}
+                      <span className="hidden xl:inline truncate max-w-[80px]">{link.label}</span>
                     </Button>
                   </Link>
                 ))}
-                
+
                 {/* INSERT NOTIFICATION BELL HERE */}
                 <NotificationBell />
 
@@ -212,10 +212,11 @@ const Navigation = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="gap-2"
+                  className="gap-1 px-2 xl:px-3"
+                  title={t('Logout')}
                 >
                   <LogOut className="h-4 w-4" />
-                  {t('Logout')}
+                  <span className="hidden xl:inline truncate max-w-[60px]">{t('Logout')}</span>
                 </Button>
               </>
             )}
@@ -241,9 +242,9 @@ const Navigation = () => {
             )}
           </div>
 
-          {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center gap-2">
-            
+          {/* Mobile/Tablet Navigation */}
+          <div className="flex lg:hidden items-center gap-2">
+
             {/* Show Bell on Mobile too if logged in */}
             {isAuthenticated && <NotificationBell />}
 
@@ -284,7 +285,7 @@ const Navigation = () => {
                   <div className="flex flex-col gap-2 mt-6">
                     {navLinks.map((link) => (
                       <Button
-                        key={link.path}
+                        key={`${link.path}-${language}`}
                         variant="ghost"
                         className="justify-start gap-3 h-12"
                         onClick={() => handleNavigation(link.path)}

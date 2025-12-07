@@ -111,7 +111,15 @@ const AllReports = () => {
                         )}
 
                         <div className="mt-2">
-                          <Badge variant={r.status === 'resolved' ? 'default' : r.status === 'in-progress' ? 'secondary' : 'outline'}>
+                          <Badge
+                            variant={r.status === 'resolved' ? 'default' : r.status === 'in-progress' ? 'secondary' : r.status === 'invalid' ? 'destructive' : 'outline'}
+                            className={
+                              r.status === 'resolved' ? 'bg-green-500 text-white' :
+                                r.status === 'invalid' ? 'bg-red-500 text-white' :
+                                  r.status === 'pending' ? 'bg-gray-800 text-white dark:bg-gray-700' :
+                                    ''
+                            }
+                          >
                             {r.status}
                           </Badge>
                         </div>
