@@ -9,8 +9,11 @@ import re
 import time
 import traceback
 
-# Initialize client
-genai.configure(api_key="AIzaSyDxrQVZCs2q_Z7HSmpuf0lYfZehcjreNq4")
+with open("apikey.txt") as f:
+    api_key = f.read().strip()
+
+genai.configure(api_key=api_key)
+
 # Use Gemini 2.0 Flash - latest model with vision support
 MODEL_NAME = "gemini-2.5-flash"
 
@@ -331,7 +334,7 @@ Example: {"category": "road", "severity": "high"}"""
 async def validate_report(image: UploadFile = File(...), description: str = Form(...)):
     """Validate if the image is environment-related and matches the description using base64"""
     try:
-        genai.GenerativeModel("gemini-2.0-flash").generate_content("hello")
+        genai.GenerativeModel("gemini-2.5-flash").generate_content("hello")
 
         img_bytes = await image.read()
         if not img_bytes:

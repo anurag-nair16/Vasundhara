@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Loader,
   Zap,
-  XCircle
+  XCircle,
+  Megaphone // Added for the new header
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -28,27 +29,13 @@ import { toast } from 'sonner';
 const WasteManagement = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef(null);
   const [issueText, setIssueText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [recentReports, setRecentReports] = useState<any[]>([]);
-  const [locationData, setLocationData] = useState<any>(null);
-  const [photoData, setPhotoData] = useState<File | null>(null);
-
-  useEffect(() => {
-    fetchStats();
-    fetchReports();
-  }, []);
-
-  // const fetchStats = async () => {
-  //   try {
-  //     const response = await apiClient.get('/auth/report-stats/');
-  //     setStats(response.data);
-  //   } catch (error) {
-  //     console.error('Failed to fetch stats:', error);
-  //   }
-  //};
-
+  const [recentReports, setRecentReports] = useState([]);
+  const [locationData, setLocationData] = useState(null);
+  const [photoData, setPhotoData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     total_reports: 0,
     resolved: 0,
@@ -56,7 +43,10 @@ const WasteManagement = () => {
     pending: 0
   });
 
-  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    fetchStats();
+    fetchReports();
+  }, []);
 
   const fetchStats = async () => {
     try {
@@ -69,7 +59,6 @@ const WasteManagement = () => {
     }
   };
 
-
   const fetchReports = async () => {
     try {
       const response = await apiClient.get('/auth/reports/');
@@ -80,7 +69,6 @@ const WasteManagement = () => {
   };
 
   const handleGetLocation = () => {
-    // In a real app, this would use the Geolocation API
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -110,10 +98,9 @@ const WasteManagement = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log('File selected:', file.name, file.size, file.type);
       setPhotoData(file);
       toast.info('Photo attached: ' + file.name);
     }
@@ -129,35 +116,21 @@ const WasteManagement = () => {
     try {
       const formData = new FormData();
       formData.append('description', issueText.trim());
-      formData.append('issue_type', 'Waste Management Issue');
+      // Updated default issue type to be more generic
+      formData.append('issue_type', 'Civic Issue'); 
       if (locationData) {
         formData.append('location', JSON.stringify(locationData));
       }
       if (photoData) {
-        // Explicitly append with filename for better backend compatibility
         formData.append('photo', photoData, photoData.name);
-        console.log('Photo attached:', photoData.name, 'Size:', photoData.size, 'Type:', photoData.type);
-      } else {
-        console.log('No photo attached');
       }
 
-      // Debug: Log all form data entries
-      console.log('FormData entries:');
-      for (const [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-        } else {
-          console.log(`  ${key}: ${value}`);
-        }
-      }
-
-      // Use native fetch for FormData to ensure correct multipart encoding
       const token = localStorage.getItem('vasundhara_access_token');
+      // Note: Ensure your API URL is correct (using localhost here based on your snippet)
       const response = await fetch('http://localhost:8000/auth/report/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type - browser will set it with boundary
         },
         body: formData,
       });
@@ -174,7 +147,7 @@ const WasteManagement = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit report');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to submit report:', error);
       toast.error(error.message || 'Failed to submit report. Please try again.');
     } finally {
@@ -189,22 +162,30 @@ const WasteManagement = () => {
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.gif,.webp,.heic"
+        accept="image/*"
         style={{ display: 'none' }}
       />
       <Navigation />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Waste & Resource Management
-          </h1>
-          <p className="text-muted-foreground">
-            Report issues, track waste collection, and contribute to a cleaner community
+          <div className="flex items-center gap-4 mb-2">
+            <div className="p-3 bg-primary/10 rounded-xl">
+              <Megaphone className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+                Civic Action Center
+              </h1>
+            </div>
+          </div>
+          <p className="text-muted-foreground ml-1">
+            Report local issues, track resolution progress, and help improve your community.
           </p>
         </motion.div>
 
@@ -214,7 +195,7 @@ const WasteManagement = () => {
             { label: 'Issues Reported', value: stats.total_reports, icon: <AlertCircle className="h-5 w-5" /> },
             { label: 'Resolved', value: stats.resolved, icon: <CheckCircle className="h-5 w-5" /> },
             { label: 'In Progress', value: stats.in_progress, icon: <Clock className="h-5 w-5" /> },
-            { label: 'CO₂ Saved', value: `${stats.resolved * 50}kg`, icon: <TrendingUp className="h-5 w-5" /> }
+            { label: 'Impact Score', value: `${stats.resolved * 50}`, icon: <TrendingUp className="h-5 w-5" /> }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -244,13 +225,13 @@ const WasteManagement = () => {
         >
           <Card className="p-6 gradient-card border-border/50 shadow-eco">
             <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Trash2 className="h-6 w-6 text-primary" />
+              <Megaphone className="h-6 w-6 text-primary" />
               {t('Report an Issue')}
             </h2>
 
             <div className="space-y-4">
               <Textarea
-                placeholder="Describe the waste management issue (e.g., bin overflow, illegal dumping)..."
+                placeholder="Describe the issue (e.g., Waste overflow, pothole, broken streetlight)..."
                 className="min-h-[120px] resize-none"
                 value={issueText}
                 onChange={(e) => setIssueText(e.target.value)}
@@ -304,29 +285,29 @@ const WasteManagement = () => {
         </motion.div>
 
         {/* Map Placeholder */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
           <Card className="p-6 gradient-card border-border/50 shadow-soft overflow-hidden">
-            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Live Resource Map</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">Live Community Map</h2>
             <div className="bg-muted/30 rounded-lg h-[250px] sm:h-[300px] md:h-[400px] flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5"></div>
               <div className="relative z-10 text-center">
                 <MapPin className="h-16 w-16 text-primary mx-auto mb-4 animate-bounce" />
                 <p className="text-muted-foreground">Interactive map showing:</p>
                 <ul className="text-sm text-muted-foreground mt-2 space-y-1">
-                  <li>• Public waste bins</li>
-                  <li>• Reported issues & hotspots</li>
-                  <li>• Real-time crew locations</li>
-                  <li>• Optimized collection routes</li>
+                  <li>• Active civic issues & hotspots</li>
+                  <li>• Public utility locations</li>
+                  <li>• Real-time crew dispatch</li>
+                  <li>• Resolution status</li>
                 </ul>
               </div>
             </div>
           </Card>
-        </motion.div>
+        </motion.div> */}
 
         {/* Recent Reports */}
         <motion.div
@@ -343,7 +324,8 @@ const WasteManagement = () => {
                     {/* Left side - Issue info */}
                     <div className="flex items-start gap-3 flex-1 min-w-[200px]">
                       <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                        <Trash2 className="h-5 w-5" />
+                        {/* Dynamic icon based on category could go here, defaulting to generic Alert */}
+                        <AlertCircle className="h-5 w-5" />
                       </div>
                       <div>
                         <h4 className="font-semibold text-foreground">{report.description}</h4>
@@ -380,12 +362,6 @@ const WasteManagement = () => {
                               {report.severity}
                             </Badge>
                           </div>
-                          {report.response_time && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold text-muted-foreground">Response:</span>
-                              <span className="text-xs text-foreground">{report.response_time}</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
@@ -417,7 +393,7 @@ const WasteManagement = () => {
               ))
             ) : (
               <Card className="p-6 text-center gradient-card border-border/50">
-                <p className="text-muted-foreground">No reports yet. Start by reporting your first issue!</p>
+                <p className="text-muted-foreground">No reports yet. Be a changemaker and report your first issue!</p>
               </Card>
             )}
           </div>
@@ -436,18 +412,14 @@ const WasteManagement = () => {
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Quantum-Optimized Routing</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Smart City Optimization</h3>
                 <p className="text-muted-foreground mb-3">
-                  AI automatically optimizes waste collection routes, reducing response time by 40% and saving 50kg CO₂ per trip.
+                  AI automatically categorizes issues and optimizes municipal response routes, ensuring your reports are handled 40% faster.
                 </p>
                 <div className="flex flex-wrap gap-4 sm:gap-6 text-sm">
                   <div>
                     <span className="text-2xl font-bold text-success">40%</span>
                     <p className="text-muted-foreground">Faster Response</p>
-                  </div>
-                  <div>
-                    <span className="text-2xl font-bold text-success">50kg</span>
-                    <p className="text-muted-foreground">CO₂ Saved/Trip</p>
                   </div>
                   <div>
                     <span className="text-2xl font-bold text-success">{stats.resolved}</span>

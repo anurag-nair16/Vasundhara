@@ -98,7 +98,7 @@ const Dashboard = () => {
             title="Unified Score"
             score={unifiedScore}
             maxScore={2000}
-            trend={45}
+            trend={unifiedScore}
             icon={<Zap className="h-6 w-6" />}
             color="primary"
             description="Combined Eco + Civic Score"
@@ -107,7 +107,7 @@ const Dashboard = () => {
             title="Eco Score"
             score={user.ecoScore}
             maxScore={1000}
-            trend={25}
+            trend={user.ecoScore}
             icon={<Leaf className="h-6 w-6" />}
             color="leaf"
             description="Environmental Impact"
@@ -116,7 +116,7 @@ const Dashboard = () => {
             title="Civic Score"
             score={user.civicScore}
             maxScore={1000}
-            trend={20}
+            trend={user.civicScore}
             icon={<Users className="h-6 w-6" />}
             color="water"
             description="Community Participation"

@@ -286,7 +286,7 @@ def create_waste_report(request):
                 args=(report_id, photo_path, description)
             )
             thread.daemon = True
-            thread.start()
+            thread.start() 
 
             print(f"[MAIN] Background validation started for report {report_id}")
 

@@ -183,7 +183,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-            <div className="bg-gradient-eco p-2 rounded-lg shadow-eco group-hover:scale-110 transition-transform">
+            <div className="bg-black p-2 rounded-lg shadow-eco group-hover:scale-110 transition-transform">
               <Leaf className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
             </div>
             <div>
@@ -276,7 +276,7 @@ const Navigation = () => {
                 <SheetContent side="right" className="w-[280px] sm:w-[320px]">
                   <SheetHeader>
                     <SheetTitle className="flex items-center gap-2">
-                      <div className="bg-gradient-eco p-2 rounded-lg">
+                      <div className="bg-black p-2 rounded-lg">
                         <Leaf className="h-5 w-5 text-primary-foreground" />
                       </div>
                       Vasundhara 2.0
